@@ -1,0 +1,9 @@
+.idea
+app/elements
+app/index.html
+bower_components
+electron-api-demos
+electron-quick-start
+node_modules
+bower.json
+gulpfile.js

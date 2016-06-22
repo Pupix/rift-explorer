@@ -1,0 +1,21 @@
+{
+  "name": "electron-app",
+  "version": "0.0.1",
+  "description": "A test application for electron",
+  "main": "app.js",
+  "scripts": {
+    "start": "electron app"
+  },
+  "author": "Robert Manolea <manolea.robert@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "glob": "^5.0.15",
+    "ps-node": "^0.1.1",
+    "tasklist": "^2.1.0"
+  },
+  "devDependencies": {
+    "devtron": "^1.0.0",
+    "electron-prebuilt": "^1.0.0",
+    "gulp": "^3.9.0"
+  }
+}
