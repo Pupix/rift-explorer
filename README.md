@@ -1,4 +1,4 @@
-# lol-alpha-client-api-explorer
+# lol-client-api-explorer
 
 An API explorer of the new League of Legends client. Just launch the league client and the api explorer, it will automatically connect to league client.
 
