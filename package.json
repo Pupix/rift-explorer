@@ -9,7 +9,7 @@
   "author": "Robert Manolea <manolea.robert@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "ps-node": "^0.1.1",
+    "ps-node": "^0.1.1"
   },
   "devDependencies": {
     "devtron": "^1.0.0",
