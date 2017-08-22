@@ -26,7 +26,7 @@
         mainWindow.loadURL('file://' + root + '/index.html');
 
         // Check if dev env FIXME
-        //mainWindow.openDevTools();
+        // mainWindow.openDevTools();
 
         // Avoid white page on load.
         mainWindow.webContents.on('did-finish-load', () => {

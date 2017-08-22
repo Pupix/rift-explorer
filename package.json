@@ -1,6 +1,6 @@
 {
   "name": "lol-client-api-explorer",
-  "version": "0.0.2",
+  "version": "0.1.0",
   "description": "Explore the API of the new League of Legends client",
   "main": "app.js",
   "scripts": {
@@ -12,8 +12,6 @@
     "ps-node": "^0.1.1"
   },
   "devDependencies": {
-    "devtron": "^1.0.0",
-    "electron": "^1.0.0",
-    "gulp": "^3.9.0"
+    "electron": "^1.7.5"
   }
 }
