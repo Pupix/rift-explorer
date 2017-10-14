@@ -5,7 +5,7 @@ An API explorer of the new League of Legends client. Just launch the league clie
 #### Setup
 
 1. Clone repository
-`git clone https://github.com/Pupix/lol-wad-parser.git`
+`git clone https://github.com/Pupix/lol-client-api-explorer.git`
 
 2. Install dependencies
 `yarn install` or `npm install`
