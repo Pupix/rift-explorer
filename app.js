@@ -2,7 +2,7 @@
     const electron = require('electron');
     const {app} = electron;
     const {BrowserWindow} = electron;
-    const root = __dirname + '/app/swagger';
+    const root = __dirname + '/app';
 
     const UX = require('./lib/ux');
 
@@ -26,7 +26,7 @@
         mainWindow.loadURL('file://' + root + '/index.html');
 
         // Check if dev env FIXME
-        // mainWindow.openDevTools();
+        //mainWindow.openDevTools();
 
         // Avoid white page on load.
         mainWindow.webContents.on('did-finish-load', () => {

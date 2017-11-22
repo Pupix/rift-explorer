@@ -1,0 +1,58 @@
+html {
+  background: #FAFAFA;
+  color:  hsla(0, 0%, 0%, 0.87);
+}
+
+.swagger-section .github {
+  width: 24px;
+  height: 24px;
+  display:  block;
+  background: transparent url(../images/github.svg) 100%/100% no-repeat;
+  float:  right;
+}
+
+.swagger-section #swagger-ui-container:empty {
+  display:  none;
+}
+
+.swagger-section #swagger-ui-container {
+  margin: 48px auto;
+}
+
+.swagger-section #swagger-ui-container .container {
+  box-sizing: border-box;
+  padding: 24px;
+  background: white;
+  box-shadow: 0 4px 5px 0 hsla(0, 0%, 0%, 0.14), 0 1px 10px 0 hsla(0, 0%, 0%, 0.12), 0 2px 4px -1px hsla(0, 0%, 0%, 0.4);
+}
+
+.swagger-section #message-bar {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-width: 100vw;
+  padding-top: 0;
+  min-height: auto;
+  color:  hsla(0, 0%, 0%, 0.54);
+
+  font-size: 34px;
+  font-weight: 400;
+  letter-spacing: 0;
+  line-height: 40px;
+}
+
+@media (max-width: 960px) {
+  .swagger-section #swagger-ui-container {
+    margin: 24px auto;
+  }
+
+  .swagger-section #swagger-ui-container .info {
+    padding: 0 16px;
+  }
+
+  .swagger-section #swagger-ui-container .container {
+    margin: 0px auto;
+    padding: 16px;
+  }
+}
