@@ -1,3 +1,4 @@
+
 html {
   background: #FAFAFA;
   color:  hsla(0, 0%, 0%, 0.87);
@@ -40,6 +41,9 @@ html {
   font-weight: 400;
   letter-spacing: 0;
   line-height: 40px;
+
+  color: hsla(0, 0%, 0%, 0.12);
+  text-shadow: rgba(0, 0, 0, 0.15) 0 0 1px;
 }
 
 @media (max-width: 960px) {

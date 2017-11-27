@@ -1,8 +1,14 @@
-# lol-client-api-explorer 🛠
+![Rift Explorer logo](assets/logo.png?raw=true)
 
-An API explorer of the new League of Legends client. Just launch the league client and the api explorer, it will automatically connect to league client.
+# Rift Explorer 🛠
 
-#### Setup
+Always up to date documentation for the League of Legends client API.
+
+#### Prebuilt
+
+Prebuilt binaries for Windows can be found [here](https://github.com/Pupix/rift-explorer/releases)
+
+#### Build from source
 
 1. Clone repository
 `git clone https://github.com/Pupix/lol-client-api-explorer.git`
@@ -14,10 +20,6 @@ An API explorer of the new League of Legends client. Just launch the league clie
 
 4. Start the api-explorer
 `yarn start` or `npm run start`
-
-5. ???
-
-6. PROFIT!
 
 ### Screenshot
 

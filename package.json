@@ -1,10 +1,11 @@
 {
-  "name": "lol-client-api-explorer",
-  "version": "0.2.1",
-  "description": "Explore the API of the new League of Legends client",
+  "name": "rift-explorer",
+  "version": "1.0.0",
+  "description": "Explore the API of the League of Legends client",
   "main": "app.js",
   "scripts": {
-    "start": "electron app"
+    "start": "electron app",
+    "build": "electron-builder --dir"
   },
   "author": "Robert Manolea <manolea.robert@gmail.com>",
   "license": "MIT",
@@ -12,6 +13,11 @@
     "ps-node": "^0.1.1"
   },
   "devDependencies": {
-    "electron": "^1.7.9"
-  }
+    "electron": "^1.7.9",
+    "electron-builder": "^19.46.9"
+  },
+  "build": {
+    "productName": "Rift Explorer",
+    "appId": "com.rift-explorer"
+ }
 }
