@@ -1,7 +1,5 @@
 ![Rift Explorer logo](assets/logo.png?raw=true)
 
-# Rift Explorer 🛠
-
 Always up to date documentation for the League of Legends client API.
 
 #### Prebuilt

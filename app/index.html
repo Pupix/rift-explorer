@@ -29,6 +29,7 @@
     <script type="text/javascript">
 
         const IPC = require('electron').ipcRenderer;
+        const shell = require('electron').shell;
         const REMOTE = require('electron').remote;
 
         IPC.on('arguments-load', (event, args) => {
@@ -45,7 +46,6 @@
                 $('pre code').each(function(i, e) {
                   hljs.highlightBlock(e)
                 });
-
 
                 const header = `Basic ${btoa(`riot:${password}`)}`;
                 const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
@@ -71,6 +71,10 @@
             alert('Trouble finding the client. Make sure your League is running.');
             REMOTE.getCurrentWindow().close();
         });
+
+        function _handleGithubLink(event) {
+          shell.openExternal('https://github.com/pupix/rift-explorer');
+        }
 
     </script>
 </head>
