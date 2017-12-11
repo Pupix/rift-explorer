@@ -1,6 +1,6 @@
 {
   "name": "rift-explorer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Explore the API of the League of Legends client",
   "main": "app.js",
   "scripts": {
@@ -10,7 +10,7 @@
   "author": "Robert Manolea <manolea.robert@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "ps-node": "^0.1.1"
+    "lcu-connector": "^1.0.0"
   },
   "devDependencies": {
     "electron": "^1.7.9",
@@ -19,5 +19,5 @@
   "build": {
     "productName": "Rift Explorer",
     "appId": "com.rift-explorer"
- }
+  }
 }

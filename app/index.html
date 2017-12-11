@@ -32,13 +32,12 @@
         const shell = require('electron').shell;
         const REMOTE = require('electron').remote;
 
-        IPC.on('arguments-load', (event, args) => {
+        IPC.on('lcu-load', (event, data) => {
 
-            const password = args['remoting-auth-token'];
-            const port = args['app-port'];
+            const { username, password, address, port } = data;
 
             window.swaggerUi = new SwaggerUi({
-              url: `https://riot:${password}@localhost:${port}/v2/swagger.json`,
+              url: `https://${username}:${password}@${address}:${port}/v2/swagger.json`,
               dom_id: "swagger-ui-container",
               supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
               onComplete(swaggerApi, swaggerUi) {
@@ -47,7 +46,7 @@
                   hljs.highlightBlock(e)
                 });
 
-                const header = `Basic ${btoa(`riot:${password}`)}`;
+                const header = `Basic ${btoa(`${username}:${password}`)}`;
                 const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
 
                 window.swaggerUi.api.clientAuthorizations.add("riot", auth);
@@ -67,11 +66,6 @@
 
         });
 
-        IPC.on('arguments-error', (event, arg) => {
-            alert('Trouble finding the client. Make sure your League is running.');
-            REMOTE.getCurrentWindow().close();
-        });
-
         function _handleGithubLink(event) {
           shell.openExternal('https://github.com/pupix/rift-explorer');
         }
@@ -80,7 +74,7 @@
 </head>
 
 <body class="swagger-section">
-    <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>Searching for League process...</div>
+    <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>Waiting for League to start...</div>
     <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
 </body>
 </html>
