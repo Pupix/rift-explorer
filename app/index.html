@@ -35,9 +35,12 @@
         IPC.on('lcu-load', (event, data) => {
 
             const { username, password, address, port } = data;
+            const header = `Basic ${btoa(`${username}:${password}`)}`;
+            const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
 
             window.swaggerUi = new SwaggerUi({
               url: `https://${username}:${password}@${address}:${port}/v2/swagger.json`,
+              authorizations: { riot: auth },
               dom_id: "swagger-ui-container",
               supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
               onComplete(swaggerApi, swaggerUi) {
@@ -46,14 +49,12 @@
                   hljs.highlightBlock(e)
                 });
 
-                const header = `Basic ${btoa(`${username}:${password}`)}`;
-                const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
-
                 window.swaggerUi.api.clientAuthorizations.add("riot", auth);
               },
               onFailure(data) {
+                console.log(data);
                 alert("Trouble loading SwaggerUI");
-                REMOTE.getCurrentWindow().close();
+                // REMOTE.getCurrentWindow().close();
               },
               docExpansion: "none",
               jsonEditor: false,

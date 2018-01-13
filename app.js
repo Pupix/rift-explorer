@@ -1,7 +1,7 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
 
-const connector = new LCUConnector();
+const connector = new LCUConnector('');
 const { app } = electron;
 const { BrowserWindow } = electron;
 const root = __dirname + '/app';
