@@ -1,6 +1,6 @@
 {
   "name": "rift-explorer",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Explore the API of the League of Legends client",
   "main": "app.js",
   "scripts": {
@@ -13,8 +13,8 @@
     "lcu-connector": "^1.0.0"
   },
   "devDependencies": {
-    "electron": "^1.7.9",
-    "electron-builder": "^19.46.9"
+    "electron": "^1.7.11",
+    "electron-builder": "^19.55.2"
   },
   "build": {
     "productName": "Rift Explorer",
