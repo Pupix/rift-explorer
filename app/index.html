@@ -34,17 +34,18 @@
 
         IPC.on('lcu-load', (event, data) => {
 
-            const { username, password, address, port } = data;
+            const { username, password, address, port, spec } = data;
             const header = `Basic ${btoa(`${username}:${password}`)}`;
             const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
 
-            window.swaggerUi = new SwaggerUi({
-              url: `https://${username}:${password}@${address}:${port}/v2/swagger.json`,
-              authorizations: { riot: auth },
-              dom_id: "swagger-ui-container",
-              supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
-              onComplete(swaggerApi, swaggerUi) {
 
+            window.swaggerUi = new SwaggerUi({
+                spec,
+                validatorUrl: null,
+                authorizations: { riot: auth },
+                dom_id: "swagger-ui-container",
+              // supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
+              onComplete(swaggerApi, swaggerUi) {
                 $('pre code').each(function(i, e) {
                   hljs.highlightBlock(e)
                 });
@@ -52,7 +53,6 @@
                 window.swaggerUi.api.clientAuthorizations.add("riot", auth);
               },
               onFailure(data) {
-                console.log(data);
                 alert("Trouble loading SwaggerUI");
                 // REMOTE.getCurrentWindow().close();
               },
@@ -64,11 +64,14 @@
             });
 
             window.swaggerUi.load();
-
         });
 
         function _handleGithubLink(event) {
-          shell.openExternal('https://github.com/pupix/rift-explorer');
+            shell.openExternal('https://github.com/pupix/rift-explorer');
+        }
+
+        function _handleDiscordLink(event) {
+            shell.openExternal('https://discord.gg/hPtrMcx');
         }
 
     </script>

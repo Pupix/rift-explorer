@@ -25,7 +25,7 @@ module.exports = async ({ address, port, username, password, protocol }) => {
         paths: {},
         info: {
             'description': 'Always up to date LCU API documentation',
-            'title': 'LeagueClient',
+            'title': 'Rift Explorer',
             'version': builds.version
         },
         produces: [

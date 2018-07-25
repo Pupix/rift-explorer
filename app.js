@@ -1,5 +1,6 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
+const createSpec = require('./createSpec');
 
 const connector = new LCUConnector('');
 const { app } = electron;
@@ -25,12 +26,13 @@ app.on('ready', () => {
     mainWindow.loadURL('file://' + root + '/index.html');
 
     // Check if dev env FIXME
-    //mainWindow.openDevTools();
+    // mainWindow.openDevTools();
 
     // Avoid white page on load.
     mainWindow.webContents.on('did-finish-load', () => {
-        connector.on('connect', (data) => {
-            mainWindow.webContents.send('lcu-load', data);
+        connector.on('connect', async (data) => {
+            const spec = await createSpec(data);
+            mainWindow.webContents.send('lcu-load', Object.assign(data, { spec }));
         });
 
         connector.start();

@@ -12,6 +12,15 @@ html {
   float:  right;
 }
 
+.swagger-section .discord {
+  width: 28px;
+  height: 28px;
+  display:  block;
+  background: transparent url(../images/discord.svg) 100%/100% no-repeat;
+  float:  right;
+  margin: -1px 4px 0 0;
+}
+
 .swagger-section #swagger-ui-container:empty {
   display:  none;
 }
