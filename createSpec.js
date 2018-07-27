@@ -53,7 +53,7 @@ module.exports = async ({ address, port, username, password, protocol }) => {
     helpFull.types = types;
     helpFull.events = events;
 
-    const help = mixin(helpConsole, helpFull);
+    const help = mixin({}, helpConsole, helpFull);
 
     Object.keys(help.types).forEach(type => {
         swagger.definitions[type] = {};
@@ -251,13 +251,138 @@ module.exports = async ({ address, port, username, password, protocol }) => {
             }
 
             result[method.toLowerCase()].parameters = funcDef.arguments.map((argument) => {
-                const isPathParameter = new RegExp(`{${argument.name}}`).test(funcDef.url);
-                return {
-                    in: isPathParameter ? 'path' : 'header',
+                let argumentLocation = 'body';
+
+                if (new RegExp(`{${argument.name}}`).test(funcDef.url)) {
+                    argumentLocation = 'path';
+                // These are the only known header arguments
+                } else if (['JWT', 'if-none-match'].includes(argument.name)) {
+                    argumentLocation = 'header';
+                }
+
+                const parameter = {
+                    in: argumentLocation,
                     name: argument.name,
-                    required: !argument.optional,
-                    type: argument.type.type
+                    required: !argument.optional
                 };
+
+                if (/^u?int/.test(argument.type.type)) {
+                    parameter.format = argument.type.type;
+                    parameter.type = 'integer';
+                    return parameter;
+                }
+
+                // Check if the type of the field is a double
+                if (argument.type.type === 'string') {
+                    parameter.type = argument.type.type;
+                }
+
+                // Check if the type of the field is a double
+                if (argument.type.type === 'double' || argument.type.type === 'float') {
+                    parameter.format = argument.type.type;
+                    parameter.type = 'number';
+                    return parameter;
+                }
+
+                // Check if the type of the field is signed as `object`
+                if (argument.type.type === 'object') {
+                    parameter.additionalProperties = true;
+                    parameter.type = argument.type.type;
+                    return parameter;
+                }
+
+                // Check if the type of the field is signed as `boolean`
+                if (argument.type.type === 'bool') {
+                    parameter.type = 'boolean';
+                    return parameter;
+                }
+
+                if (argument.type.type === 'map') {
+                    parameter.type = 'object';
+
+                    if (argument.type.elementType === 'object') {
+                        parameter.additionalProperties = {
+                            additionalProperties: true,
+                            type: 'object'
+                        };
+                        return parameter;
+                    }
+
+                    if (argument.type.elementType === 'string') {
+                        parameter.additionalProperties = {
+                            type: 'string'
+                        };
+                        return parameter;
+                    }
+
+                    if (/^u?int/.test(argument.type.elementType)) {
+                        parameter.additionalProperties = {
+                            format: argument.type.elementType,
+                            type: 'integer'
+                        };
+                        return parameter;
+                    }
+
+                    if (argument.type.elementType === 'double' || argument.type.elementType === 'float') {
+                        parameter.additionalProperties = {
+                            format: argument.type.elementType,
+                            type: 'number'
+                        };
+                        return parameter;
+                    }
+
+                    parameter.additionalProperties = {
+                        $ref: `#/definitions/${argument.type.elementType}`,
+                    };
+
+                    return parameter;
+                }
+
+                if (argument.type.type === 'vector') {
+                    parameter.type = 'array';
+
+                    if (argument.type.elementType === 'object') {
+                        parameter.items = {
+                            additionalProperties: true,
+                            type: 'object'
+                        };
+                        return parameter;
+                    }
+
+                    if (argument.type.elementType === 'string') {
+                        parameter.items = {
+                            type: 'string'
+                        };
+                        return parameter;
+                    }
+
+                    if (/^u?int/.test(argument.type.elementType)) {
+                        parameter.items = {
+                            format: argument.type.elementType,
+                            type: 'integer'
+                        };
+                        return parameter;
+                    }
+
+                    if (argument.type.elementType === 'double' || argument.type.elementType === 'float') {
+                        parameter.items = {
+                            format: argument.type.elementType,
+                            type: 'number'
+                        };
+                        return parameter;
+                    }
+
+                    parameter.items = {
+                        $ref: `#/definitions/${argument.type.elementType}`,
+                    };
+
+                    return parameter;
+                }
+
+                parameter.schema = { $ref: `#/definitions/${argument.type.type}` };
+                delete parameter.type;
+
+                return parameter;
             });
 
             if (funcDef.http_method === 'GET' || funcDef.http_method === 'POST') {
