@@ -1291,7 +1291,7 @@ SwaggerClient.prototype.build = function (mock) {
         } else if (response.status === 0) {
           return self.fail('Can\'t read from server.  It may not have the appropriate access-control-origin settings.');
         } else if (response.status === 404) {
-          return self.fail('Can\'t read swagger JSON from ' + self.url);
+          return self.fail('Can\'t load Swagger. Make sure it\'s enabled in system.yaml');
         } else {
           return self.fail(response.status + ' : ' + response.statusText + ' ' + self.url);
         }

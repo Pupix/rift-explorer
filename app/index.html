@@ -34,17 +34,15 @@
 
         IPC.on('lcu-load', (event, data) => {
 
-            const { username, password, address, port, spec } = data;
+            const { username, password, address, port } = data;
             const header = `Basic ${btoa(`${username}:${password}`)}`;
             const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
 
-
             window.swaggerUi = new SwaggerUi({
-                spec,
                 validatorUrl: null,
+                url: `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`,
                 authorizations: { riot: auth },
                 dom_id: "swagger-ui-container",
-              // supportedSubmitMethods: ['get', 'post', 'put', 'delete', 'patch'],
               onComplete(swaggerApi, swaggerUi) {
                 $('pre code').each(function(i, e) {
                   hljs.highlightBlock(e)
@@ -52,9 +50,8 @@
 
                 window.swaggerUi.api.clientAuthorizations.add("riot", auth);
               },
-              onFailure(data) {
-                alert("Trouble loading SwaggerUI");
-                // REMOTE.getCurrentWindow().close();
+              onFailure(error) {
+                // alert('Couldn\'t load the swagger file. Make sure swagger is enabled. More info at https://github.com/Pupix/rift-explorer');
               },
               docExpansion: "none",
               jsonEditor: false,

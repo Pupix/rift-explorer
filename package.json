@@ -1,6 +1,6 @@
 {
   "name": "rift-explorer",
-  "version": "2.0.1",
+  "version": "3.0.0",
   "description": "Explore the API of the League of Legends client",
   "main": "app.js",
   "scripts": {
