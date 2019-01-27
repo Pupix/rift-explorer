@@ -295,7 +295,7 @@ Handlebars.registerHelper('renderTextParam', function(param) {
 });
 
 this["Handlebars"]["templates"]["main"] = Handlebars.template({"1":function(depth0,helpers,partials,data) {
-  var stack1, lambda=this.lambda, escapeExpression=this.escapeExpression, buffer = "  <a class=\"github\" title=\"Click to visit the official repository\" href=\"#\" onclick=\"_handleGithubLink(this);\"></a><a class=\"discord\" title=\"Join the Discord server\" href=\"#\" onclick=\"_handleDiscordLink(this);\"></a><div class=\"info_title\">"
+  var stack1, lambda=this.lambda, escapeExpression=this.escapeExpression, buffer = "  <img class=\"logo\" src=\"images/logo.png\"/><a class=\"github\" title=\"Click to visit the official repository\" href=\"#\" onclick=\"_handleGithubLink(this);\"></a><a class=\"discord\" title=\"Join the Discord server\" href=\"#\" onclick=\"_handleDiscordLink(this);\"></a><div class=\"info_title\">"
     + escapeExpression(lambda(((stack1 = (depth0 != null ? depth0.info : depth0)) != null ? stack1.title : stack1), depth0))
     + "</div>\n  <div class=\"info_description markdown\">";
   stack1 = lambda(((stack1 = (depth0 != null ? depth0.info : depth0)) != null ? stack1.description : stack1), depth0);
@@ -361,7 +361,7 @@ this["Handlebars"]["templates"]["main"] = Handlebars.template({"1":function(dept
     + "</a></div>";
 },"14":function(depth0,helpers,partials,data) {
   var stack1, lambda=this.lambda, escapeExpression=this.escapeExpression;
-  return "  , <span style=\"font-variant: small-caps\" data-sw-translate>api version</span>: "
+  return "<span style=\"font-variant: small-caps\" data-sw-translate>version</span>: "
     + escapeExpression(lambda(((stack1 = (depth0 != null ? depth0.info : depth0)) != null ? stack1.version : stack1), depth0))
     + "\n    ";
 },"16":function(depth0,helpers,partials,data) {
@@ -379,9 +379,7 @@ this["Handlebars"]["templates"]["main"] = Handlebars.template({"1":function(dept
   var stack1, helper, functionType="function", helperMissing=helpers.helperMissing, escapeExpression=this.escapeExpression, buffer = "<div class='info' id='api_info'>\n";
   stack1 = helpers['if'].call(depth0, (depth0 != null ? depth0.info : depth0), {"name":"if","hash":{},"fn":this.program(1, data),"inverse":this.noop,"data":data});
   if (stack1 != null) { buffer += stack1; }
-  buffer += "</div>\n<div class='container' id='resources_container'>\n  <ul id='resources'></ul>\n\n  <div class=\"footer\">\n    <h4 style=\"color: #999\">[ <span style=\"font-variant: small-caps\">base url</span>: "
-    + escapeExpression(((helper = (helper = helpers.basePath || (depth0 != null ? depth0.basePath : depth0)) != null ? helper : helperMissing),(typeof helper === functionType ? helper.call(depth0, {"name":"basePath","hash":{},"data":data}) : helper)))
-    + "\n";
+  buffer += "</div>\n<div class='container' id='resources_container'>\n  <ul id='resources'></ul>\n\n  <div class=\"footer\">\n    <h4 style=\"color: #999\">[";
   stack1 = helpers['if'].call(depth0, ((stack1 = (depth0 != null ? depth0.info : depth0)) != null ? stack1.version : stack1), {"name":"if","hash":{},"fn":this.program(14, data),"inverse":this.noop,"data":data});
   if (stack1 != null) { buffer += stack1; }
   buffer += "]\n";
@@ -1355,11 +1353,12 @@ SwaggerClient.prototype.buildFromSpec = function (response) {
   this.basePath = response.basePath || '';
   this.consumes = response.consumes;
   this.host = response.host || '';
-  this.info = response.info || {};
+  this.info = RE.info;
   this.produces = response.produces;
   this.schemes = response.schemes || [];
   this.securityDefinitions = response.securityDefinitions;
-  this.title = response.title || '';
+  this.title = RE.info.title;
+  this.version = RE.version;
 
   if (response.externalDocs) {
     this.externalDocs = response.externalDocs;

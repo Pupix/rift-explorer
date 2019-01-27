@@ -4,6 +4,14 @@ html {
   color:  hsla(0, 0%, 0%, 0.87);
 }
 
+.swagger-section .logo {
+  width: 54px;
+  height: 54px;
+  display: block;
+  float: left;
+  margin: -6px 12px 0 0;
+}
+
 .swagger-section .github {
   width: 24px;
   height: 24px;
@@ -53,6 +61,10 @@ html {
 
   color: hsla(0, 0%, 0%, 0.12);
   text-shadow: rgba(0, 0, 0, 0.15) 0 0 1px;
+}
+
+.swagger-section .swagger-ui-wrap .info_title {
+  padding-bottom: 0;
 }
 
 @media (max-width: 960px) {

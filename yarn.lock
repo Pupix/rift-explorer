@@ -792,6 +792,15 @@ fs-extra@^5.0.0:
     jsonfile "^4.0.0"
     universalify "^0.1.0"
 
+fs-extra@^7.0.1:
+  version "7.0.1"
+  resolved "https://registry.yarnpkg.com/fs-extra/-/fs-extra-7.0.1.tgz#4f189c44aa123b895f722804f55ea23eadc348e9"
+  integrity sha512-YJDaCJZEnBmcbw13fvdAM9AwNOJwOzrE4pqMqBq5nFiEqXUqHwlK4B+3pUw6JNvfSPtX05xFHtYy/1ni01eGCw==
+  dependencies:
+    graceful-fs "^4.1.2"
+    jsonfile "^4.0.0"
+    universalify "^0.1.0"
+
 fs.realpath@^1.0.0:
   version "1.0.0"
   resolved "https://registry.yarnpkg.com/fs.realpath/-/fs.realpath-1.0.0.tgz#1504ad2523158caa40db4a2787cb01411994ea4f"
@@ -1263,9 +1272,10 @@ lcid@^1.0.0:
   dependencies:
     invert-kv "^1.0.0"
 
-lcu-connector@^1.0.0:
-  version "1.0.1"
-  resolved "https://registry.yarnpkg.com/lcu-connector/-/lcu-connector-1.0.1.tgz#42c053b34283bd0594d369c7340f4b8d0ff927b5"
+lcu-connector@^2.0.0:
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/lcu-connector/-/lcu-connector-2.0.0.tgz#f78414cb479a86621154e70d323042418a3376b7"
+  integrity sha512-PbSeic0vbzOKau47mMm3TyM1YWaO3Njmc7GAXpGqGoRxrxPjab4CMKR7XPEm6zpZf18BOXxwo0fOXbJi5lGz3A==
   dependencies:
     chokidar "1.7.0"
     fs-extra "4.0.3"
@@ -2346,6 +2356,11 @@ y18n@^3.2.1:
 yallist@^2.1.2:
   version "2.1.2"
   resolved "https://registry.yarnpkg.com/yallist/-/yallist-2.1.2.tgz#1c11f9218f076089a47dd512f93c6699a6a81d52"
+
+yaml@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/yaml/-/yaml-1.2.1.tgz#7057ee224c96e7dcd591a83a871ad89d3df1c6ed"
+  integrity sha512-LuOeoZc6LYguU9H/XCbrPfuDpCGJVf+o/r9uLCGnsHiHk/8Cr7IVeXOilO8yK0XA8QJPlX22KVofINt8xhdwqg==
 
 yargs-parser@^8.1.0:
   version "8.1.0"
