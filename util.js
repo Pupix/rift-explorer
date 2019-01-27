@@ -6,7 +6,7 @@ module.exports.getLCUPathFromProcess = () => {
     return new Promise(resolve => {
         const command = IS_WIN ?
             `WMIC PROCESS WHERE name='LeagueClientUx.exe' GET ExecutablePath` :
-            `ps x -o comm= | grep 'LeagueClientUx'`;
+            `ps x -o comm= | grep 'LeagueClientUx$'`;
 
         cp.exec(command, (err, stdout, stderr) => {
             if (err || !stdout || stderr) {
