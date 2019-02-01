@@ -1,6 +1,6 @@
 {
   "name": "rift-explorer",
-  "version": "4.0.1",
+  "version": "4.0.2",
   "description": "Always up to date documentation for the League Client API",
   "main": "app.js",
   "scripts": {
