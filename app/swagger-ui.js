@@ -25925,7 +25925,12 @@ SwaggerUi.Views.OperationView = Backbone.View.extend({
     // adds curl output
     var curlCommand = this.model.asCurl(this.map, {responseContentType: contentType});
     curlCommand = curlCommand.replace('!', '&#33;');
-    $( 'div.curl', $(this.el)).html('<pre>' + curlCommand + '</pre>');
+    var pre = document.createElement('pre');
+    pre.textContent = curlCommand;
+    $( 'div.curl', $(this.el)).html(pre);
+    // Not like this Swagger devs. This is prone to XSS if you send HTML over the wire since the code doesn't get sanitized
+    // It will actually embed stuff like <img src=1 onerror="alert(1)"/> and execute the JS
+    // $( 'div.curl', $(this.el)).html('<pre>' + curlCommand + '</pre>');
 
     // only highlight the response if response is less than threshold, default state is highlight response
     var opts = this.options.swaggerOptions;
