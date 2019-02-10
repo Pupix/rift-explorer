@@ -449,7 +449,7 @@ this["Handlebars"]["templates"]["operation"] = Handlebars.template({"1":function
   },"26":function(depth0,helpers,partials,data) {
   return "";
 },"28":function(depth0,helpers,partials,data) {
-  return "          <div class='sandbox_header'>\n            <input class='submit' type='submit' value='Try it out!' data-sw-translate/>\n            <a href='#' class='response_hider' style='display:none' data-sw-translate>Hide Response</a>\n            <span class='response_throbber' style='display:none'></span>\n          </div>\n";
+  return "          <div class='sandbox_header'>\n            <input class='submit' type='submit' value='Make request' data-sw-translate/>\n            <a href='#' class='response_hider' style='display:none' data-sw-translate>Hide Response</a>\n            <span class='response_throbber' style='display:none'></span>\n          </div>\n";
   },"30":function(depth0,helpers,partials,data) {
   return "          <h4 data-sw-translate>Request Headers</h4>\n          <div class='block request_headers'></div>\n";
   },"compiler":[6,">= 2.0.0-beta.1"],"main":function(depth0,helpers,partials,data) {
@@ -25912,15 +25912,14 @@ SwaggerUi.Views.OperationView = Backbone.View.extend({
       pre = $('<pre class="json" />').append(code);
     }
     var response_body = pre;
-    $('.request_url', $(this.el)).html('<pre></pre>');
+    $('.request_url', $(this.el)).html('<pre class="markdown"></pre>');
     $('.request_url pre', $(this.el)).text(url);
-    $('.response_code', $(this.el)).html('<pre>' + response.status + '</pre>');
+    $('.response_code', $(this.el)).html('<pre class="json">' + response.status + '</pre>');
     $('.response_body', $(this.el)).html(response_body);
     $('.response_headers', $(this.el)).html('<pre>' + _.escape(JSON.stringify(response.headers, null, '  ')).replace(/\n/g, '<br>') + '</pre>');
     $('.response', $(this.el)).slideDown();
     $('.response_hider', $(this.el)).show();
     $('.response_throbber', $(this.el)).hide();
-
 
     // adds curl output
     var curlCommand = this.model.asCurl(this.map, {responseContentType: contentType});
@@ -25928,6 +25927,7 @@ SwaggerUi.Views.OperationView = Backbone.View.extend({
     var pre = document.createElement('pre');
     pre.textContent = curlCommand;
     $( 'div.curl', $(this.el)).html(pre);
+      hljs.highlightBlock(pre);
     // Not like this Swagger devs. This is prone to XSS if you send HTML over the wire since the code doesn't get sanitized
     // It will actually embed stuff like <img src=1 onerror="alert(1)"/> and execute the JS
     // $( 'div.curl', $(this.el)).html('<pre>' + curlCommand + '</pre>');
@@ -25944,11 +25944,17 @@ SwaggerUi.Views.OperationView = Backbone.View.extend({
     }
 
     var response_body_el = $('.response_body', $(this.el))[0];
+
+      hljs.highlightBlock($('.request_url pre', $(this.el))[0]);
+      hljs.highlightBlock($('.request_headers pre', $(this.el))[0]);
+      hljs.highlightBlock($('.response_headers pre', $(this.el))[0]);
+      hljs.highlightBlock($('.response_code pre', $(this.el))[0]);
+
     // only highlight the response if response is less than threshold, default state is highlight response
     if (opts.highlightSizeThreshold && typeof response.data !== 'undefined' && response.data.length > opts.highlightSizeThreshold) {
       return response_body_el;
     } else {
-      return hljs.highlightBlock(response_body_el);
+      return hljs.highlightBlock(response_body_el.firstElementChild);
     }
   },
 
