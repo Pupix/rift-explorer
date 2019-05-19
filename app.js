@@ -27,7 +27,7 @@ app.on('ready', () => {
     });
 
     // Check if dev env FIXME
-    mainWindow.openDevTools();
+    // mainWindow.openDevTools();
 
     // Remove default menu
     mainWindow.setMenu(null);
