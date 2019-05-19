@@ -1,14 +1,15 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
-const fs = require('fs-extra');
-const path = require('path');
-const yaml = require('yaml');
-const { getLCUPathFromProcess } = require('./util');
+const {
+    duplicateSystemYaml,
+    restartLCUWithOverride,
+ } = require('./util');
 
 const connector = new LCUConnector();
-const { app } = electron;
+const { app, dialog } = electron;
 const { BrowserWindow } = electron;
 const root = __dirname + '/app';
+let LCURestarted = false;
 
 app.commandLine.appendSwitch('--ignore-certificate-errors');
 
@@ -16,7 +17,6 @@ app.on('ready', () => {
     let mainWindow = null;
     let windowLoaded = false;
     let LCUData = null;
-    let swaggerDisabled = true;
 
     mainWindow = new BrowserWindow({
         center: true,
@@ -27,7 +27,7 @@ app.on('ready', () => {
     });
 
     // Check if dev env FIXME
-    // mainWindow.openDevTools();
+    mainWindow.openDevTools();
 
     // Remove default menu
     mainWindow.setMenu(null);
@@ -43,7 +43,6 @@ app.on('ready', () => {
             return;
         }
 
-        mainWindow.webContents.send(swaggerDisabled ? 'swagger-disabled' : 'swagger-enabled');
         mainWindow.webContents.send('lcu-load', LCUData);
     });
 
@@ -58,34 +57,31 @@ app.on('ready', () => {
             LCUData = data;
 
             try {
-                const LCUPath = await getLCUPathFromProcess();
-                const systemFile = path.join(LCUPath, 'system.yaml');
-
-                // File doesn't exist, do nothing
-                if (!(await fs.pathExists(systemFile))) {
-                    throw new Error('system.yaml not found');
+                if (LCURestarted) {
+                    mainWindow.webContents.send('lcu-load', LCUData);
+                    return;
                 }
 
-                const file = await fs.readFile(systemFile, 'utf8');
-                const fileParsed = yaml.parse(file);
+                await duplicateSystemYaml();
+                const response = dialog.showMessageBox({
+                    type: 'info',
+                    buttons: [ 'Cancel', 'Ok' ],
+                    title: 'Rift Explorer',
+                    message: 'Rift Explorer needs to restart your League of Legends client to work properly',
+                    cancelId: 0,
+                });
 
-                swaggerDisabled = !fileParsed.enable_swagger;
-                mainWindow.webContents.send(swaggerDisabled ? 'swagger-disabled' : 'swagger-enabled');
-
-                if (!fileParsed.enable_swagger) {
-                    fileParsed.enable_swagger = true;
-                    const stringifiedFile = yaml.stringify(fileParsed);
-
-                    // Rito's file is prefixed with --- newline
-                    await fs.outputFile(systemFile, `---\n${stringifiedFile}`);
+                if (!response) {
+                    mainWindow.close();
+                    return;
                 }
 
+                await restartLCUWithOverride();
+                LCURestarted = true;
             } catch (error) {
                 console.error(error);
                 // No error handling for now
             }
-
-            mainWindow.webContents.send('lcu-load', LCUData);
         }, 5000);
     });
 

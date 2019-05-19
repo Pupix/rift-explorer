@@ -41,7 +41,6 @@
 
             let LCUData = null;
             let swaggerDisabled = true;
-            let loadingSwagger = false;
 
             // We all love global variables
             window.RE = {
@@ -57,16 +56,12 @@
                 const header = `Basic ${btoa(`${username}:${password}`)}`;
                 const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
 
-                loadingSwagger = true;
-
                 window.swaggerUi = new SwaggerUi({
                     validatorUrl: null,
                     url: `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`,
                     authorizations: { riot: auth },
                     dom_id: "swagger-ui-container",
                     onComplete() {
-                        loadingSwagger = false;
-
                         document.querySelectorAll('pre code').forEach((block) => {
                             hljs.highlightBlock(block);
                         });
@@ -86,44 +81,13 @@
 
             IPC.on('lcu-load', (event, data) => {
                 LCUData = data;
-
-                if (!swaggerDisabled && !loadingSwagger) {
-                    loadSwagger();
-                }
+                loadSwagger();
             });
 
             IPC.on('lcu-unload', () => {
                 LCUData = null;
                 swaggerContainer.innerHTML = '';
                 messageBar.innerHTML = 'Waiting for League to start...';
-            });
-
-            IPC.on('swagger-disabled', () => {
-                swaggerDisabled = true;
-                messageBar.innerHTML = 'API has been auto-enabled. Please restart the League Client';
-
-                // Allow the DOM to render the new HTML
-                setTimeout(() => {
-                    const allowedRestart = confirm('Rift Explorer needs to restart the League Client to enable the API documentation');
-
-                    if (allowedRestart) {
-                        const { username, password, address, port } = LCUData;
-
-                        fetch(`https://${address}:${port}/process-control/v1/process/restart?delaySeconds=0`, {
-                            method: 'POST',
-                            headers: new Headers({ Authorization: `Basic ${btoa(`${username}:${password}`)}` })
-                        });
-                    }
-                }, 100);
-            });
-
-            IPC.on('swagger-enabled', () => {
-                swaggerDisabled = false;
-                messageBar.innerHTML = 'Waiting for League to start...';
-
-                if (LCUData && !loadingSwagger) {
-                    loadSwagger();
-                }
             });
 
             function _handleGithubLink(event) {
