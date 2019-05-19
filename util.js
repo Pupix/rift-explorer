@@ -2,8 +2,8 @@ const cp = require('child_process');
 const path = require('path');
 const fs = require('fs-extra');
 const yaml = require('yaml');
-const fkill = require('fkill');
-const execa = require('execa');
+const { execFile } = require('child_process');
+const requestPromise = require('request-promise');
 
 const IS_WIN = process.platform === 'win32';
 const LEAGUE_PROCESS = IS_WIN ? 'LeagueClient.exe' : 'LeagueClient';
@@ -25,7 +25,6 @@ function getLCUExecutableFromProcess() {
         });
     });
 };
-
 
 async function duplicateSystemYaml() {
     const LCUExePath = await getLCUExecutableFromProcess();
@@ -49,21 +48,25 @@ async function duplicateSystemYaml() {
     await fs.outputFile(overrideSystemFile, `---\n${stringifiedFile}`);
 }
 
-function restartLCUWithOverride() {
+function restartLCUWithOverride(LCUData) {
     return new Promise(async (resolve, reject) => {
         const LCUExePath = await getLCUExecutableFromProcess();
         const LCUDir = path.dirname(LCUExePath);
         const overrideSystemFile = path.join(LCUDir, 'Config', 'rift-explorer', 'system.yaml');
-    
-        // Windows is unable to kill the child processes for some reason so we have to force kill it
-        await fkill(LEAGUE_PROCESS, { force: true });
-
-        // By force killing it the LeagueClient doesn't cleanup the lockfile so we gotta do it manually
-        await fs.remove(path.join(LCUDir, 'lockfile'));
+        const { username, password, address, port } = LCUData;
+        
+        await requestPromise({
+            strictSSL: false,
+            method: 'POST',
+            maxBuffer: 1024 * 1024 * 1024, 
+            uri: `https://${username}:${password}@${address}:${port}/process-control/v1/process/quit`,
+        });
         
         // Give it some time to do cleanup
-        execa(LCUExePath, [`--system-yaml-override=${overrideSystemFile}`], { detached: true });
-        resolve();
+        setTimeout(() => {
+            execFile(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`]);
+            resolve();
+        }, 5000);
     });
 }
 

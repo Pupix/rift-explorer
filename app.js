@@ -76,7 +76,7 @@ app.on('ready', () => {
                     return;
                 }
 
-                await restartLCUWithOverride();
+                await restartLCUWithOverride(LCUData);
                 LCURestarted = true;
             } catch (error) {
                 console.error(error);
