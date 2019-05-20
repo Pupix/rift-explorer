@@ -57,14 +57,15 @@ function restartLCUWithOverride(LCUData) {
         
         await requestPromise({
             strictSSL: false,
-            method: 'POST',
-            maxBuffer: 1024 * 1024 * 1024, 
+            method: 'POST', 
             uri: `https://${username}:${password}@${address}:${port}/process-control/v1/process/quit`,
         });
         
         // Give it some time to do cleanup
         setTimeout(() => {
-            execFile(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`]);
+            execFile(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`], {
+                maxBuffer: 1024 * 1024 * 1024 // 1GB
+            });
             resolve();
         }, 5000);
     });

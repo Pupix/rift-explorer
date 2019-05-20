@@ -59,6 +59,7 @@ app.on('ready', () => {
             try {
                 if (LCURestarted) {
                     mainWindow.webContents.send('lcu-load', LCUData);
+                    LCURestarted = false;
                     return;
                 }
 
