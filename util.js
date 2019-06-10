@@ -2,7 +2,7 @@ const cp = require('child_process');
 const path = require('path');
 const fs = require('fs-extra');
 const yaml = require('yaml');
-const { execFile } = require('child_process');
+const { spawn } = require('child_process');
 const requestPromise = require('request-promise');
 
 const IS_WIN = process.platform === 'win32';
@@ -63,9 +63,12 @@ function restartLCUWithOverride(LCUData) {
         
         // Give it some time to do cleanup
         setTimeout(() => {
-            execFile(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`], {
-                maxBuffer: 1024 * 1024 * 1024 // 1GB
+            const leagueProcess = spawn(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`], {
+                detached: true,
+                stdio: 'ignore'
             });
+
+            leagueProcess.unref();
             resolve();
         }, 5000);
     });
