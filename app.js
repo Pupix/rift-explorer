@@ -8,7 +8,15 @@ const {
 const connector = new LCUConnector();
 const { app, dialog } = electron;
 const { BrowserWindow } = electron;
+const DiscordRPC = require('discord-rpc');
+
 const root = __dirname + '/app';
+
+const clientId = '616399117580763176';
+const scopes = ['rpc', 'rpc.api'];
+const rpc = new DiscordRPC.Client({ transport: 'ipc' });
+const startTimestamp = new Date();
+
 let LCURestarted = false;
 
 app.commandLine.appendSwitch('--ignore-certificate-errors');
@@ -23,11 +31,16 @@ app.on('ready', () => {
         height: 720,
         show: false,
         width: 1280,
-        title: 'Rift Explorer'
+        title: 'Rift Explorer',
+        backgroundColor: '#303030',
+        webPreferences: {
+          nodeIntegration: true
+        }
     });
 
-    // Check if dev env FIXME
-    // mainWindow.openDevTools();
+    if (process.env.NODE_ENV === 'development') {
+        mainWindow.openDevTools();
+    }
 
     // Remove default menu
     mainWindow.setMenu(null);
@@ -94,11 +107,35 @@ app.on('ready', () => {
         }
     });
 
+    async function setActivity() {
+        if (!rpc || !mainWindow) {
+            return;
+        }
+
+        rpc.setActivity({
+            startTimestamp,
+            largeImageKey: 'rift',
+            largeImageText: 'Rift Explorer',
+            instance: false,
+        });
+    }
+
+    rpc.on('ready', () => {
+        setActivity();
+
+        // activity can only be set every 15 seconds
+        setInterval(() => {
+            setActivity();
+        }, 15e3);
+    });
+
     connector.start();
-});
+    rpc.login({ clientId }).catch(console.error);
+ });
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
+        rpc.destroy();
         app.quit();
     }
 });
