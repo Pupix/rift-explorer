@@ -1,5 +1,6 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
+const DiscordRPC = require('discord-rpc');
 const {
     duplicateSystemYaml,
     restartLCUWithOverride,
@@ -8,12 +9,10 @@ const {
 const connector = new LCUConnector();
 const { app, dialog } = electron;
 const { BrowserWindow } = electron;
-const DiscordRPC = require('discord-rpc');
 
 const root = __dirname + '/app';
 
-const clientId = '616399117580763176';
-const scopes = ['rpc', 'rpc.api'];
+const clientId = '616399159322214425';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
 
