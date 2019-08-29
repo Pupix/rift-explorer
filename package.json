@@ -1,6 +1,6 @@
 {
   "name": "rift-explorer",
-  "version": "6.1.1",
+  "version": "6.2.0",
   "description": "Always up to date documentation for the League Client API",
   "main": "app.js",
   "scripts": {
@@ -10,16 +10,16 @@
   "author": "Robert Manolea <manolea.robert@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "fs-extra": "^7.0.1",
-    "lcu-connector": "^2.0.0",
-    "mixin-deep": "^2.0.0",
-    "request": "^2.87.0",
-    "request-promise": "^4.2.2",
-    "yaml": "^1.2.1"
+    "discord-rpc": "^3.0.2",
+    "fs-extra": "^8.1.0",
+    "lcu-connector": "^2.1.2",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.4",
+    "yaml": "^1.6.0"
   },
   "devDependencies": {
-    "electron": "^1.7.11",
-    "electron-builder": "^19.55.2"
+    "electron": "^6.0.5",
+    "electron-builder": "^21.2.0"
   },
   "build": {
     "productName": "Rift Explorer",
