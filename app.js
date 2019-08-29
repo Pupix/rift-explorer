@@ -134,7 +134,7 @@ app.on('ready', () => {
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        rpc.destroy();
         app.quit();
     }
+    rpc.destroy();
 });
