@@ -76,12 +76,13 @@ app.on('ready', () => {
                 }
 
                 await duplicateSystemYaml();
-                const response = dialog.showMessageBox({
+                const response = dialog.showMessageBoxSync({
                     type: 'info',
                     buttons: [ 'Cancel', 'Ok' ],
                     title: 'Rift Explorer',
                     message: 'Rift Explorer needs to restart your League of Legends client to work properly',
                     cancelId: 0,
+                    noLink: true
                 });
 
                 if (!response) {
@@ -116,17 +117,19 @@ app.on('ready', () => {
             largeImageKey: 'rift',
             largeImageText: 'Rift Explorer',
             instance: false,
-        });
+        }).catch(console.error);
     }
 
     rpc.on('ready', () => {
-        setActivity();
+        setActivity().catch(console.error);
 
         // activity can only be set every 15 seconds
         setInterval(() => {
-            setActivity();
+            setActivity().catch(console.error);
         }, 15e3);
     });
+
+    rpc.on('error', console.error);
 
     connector.start();
     rpc.login({ clientId }).catch(console.error);
@@ -134,7 +137,7 @@ app.on('ready', () => {
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
+        rpc.destroy().catch(console.error);
         app.quit();
     }
-    rpc.destroy();
 });
