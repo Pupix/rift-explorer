@@ -1,0 +1,86 @@
+{
+  "extends": [
+    "airbnb-base",
+    "eslint:recommended",
+    "plugin:node/recommended"
+  ],
+
+  "env": {
+    "browser": true,
+    "node": true,
+  },
+
+  "plugins": [
+    // Node specific ESLint rules (requires eslint-plugin-node)
+    "node",
+
+    // Enable es6 imports (requires eslint-plugin-import)
+    "import",
+
+    // Enable linting in html files (requires eslint-plugin-html)
+    "html"
+  ],
+
+  "parserOptions": {
+    "ecmaVersion": 9,
+    "sourceType": "module",
+  },
+
+  "settings": {
+    "import/core-modules": [
+      "electron"
+    ]
+  },
+
+  "rules": {
+
+    "no-console": "off",
+
+    "indent": ["error", 4, {
+      "SwitchCase": 1,
+      "VariableDeclarator": 1,
+      "outerIIFEBody": 1,
+      // MemberExpression: null,
+      "FunctionDeclaration": {
+          "parameters": 1,
+          "body": 1
+      },
+      "FunctionExpression": {
+          "parameters": 1,
+          "body": 1
+      },
+      "CallExpression": {
+          "arguments": 1
+      },
+      "ArrayExpression": 1,
+      "ObjectExpression": 1,
+      "ImportDeclaration": 1,
+      "flatTernaryExpressions": false,
+      "ignoreComments": false
+    }],
+
+    "no-underscore-dangle": ["error", {
+      "allowAfterThis": true,
+      "allowAfterSuper": true
+    }],
+
+    "max-len": ["error", 120, 2, {
+      "ignoreUrls": true,
+      "ignoreComments": false,
+      "ignoreRegExpLiterals": true,
+      "ignoreStrings": true,
+      "ignoreTemplateLiterals": true
+    }],
+
+    "node/no-unpublished-require": ["error", {
+         "allowModules": ["electron"]
+    }],
+
+    "no-async-promise-executor": "off",
+
+    "linebreak-style": ["error", "windows"],
+
+    "operator-linebreak": ["error", "after"],
+  }
+
+}

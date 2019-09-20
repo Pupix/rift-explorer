@@ -9,7 +9,7 @@ const IS_WIN = process.platform === 'win32';
 const LEAGUE_PROCESS = IS_WIN ? 'LeagueClient.exe' : 'LeagueClient';
 
 function getLCUExecutableFromProcess() {
-    return new Promise(resolve => {
+    return new Promise((resolve, reject) => {
         const command = IS_WIN ?
             `WMIC PROCESS WHERE name='${LEAGUE_PROCESS}' GET ExecutablePath` :
             `ps x -o comm= | grep '${LEAGUE_PROCESS}$'`;
@@ -20,15 +20,15 @@ function getLCUExecutableFromProcess() {
                 return;
             }
 
-            const normalizedPath = path.normalize(stdout); 
+            const normalizedPath = path.normalize(stdout);
             resolve(IS_WIN ? normalizedPath.split(/\n|\n\r/)[1] : normalizedPath);
         });
     });
-};
+}
 
 async function duplicateSystemYaml() {
     const LCUExePath = await getLCUExecutableFromProcess();
-    const LCUDir = IS_WIN ? path.dirname(LCUExePath) : path.dirname(LCUExePath) + '/../../..';
+    const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
 
     const originalSystemFile = path.join(LCUDir, 'system.yaml');
     const overrideSystemFile = path.join(LCUDir, 'Config', 'rift-explorer', 'system.yaml');
@@ -39,9 +39,10 @@ async function duplicateSystemYaml() {
     }
 
     const file = await fs.readFile(originalSystemFile, 'utf8');
-    const fileParsed = yaml.parse(file);
-    
-    fileParsed.enable_swagger = true;
+    const fileParsed = yaml.parseDocument(file);
+
+    fileParsed.delete('riotclient');
+    fileParsed.set('enable_swagger', true);
 
     const stringifiedFile = yaml.stringify(fileParsed);
     // Rito's file is prefixed with --- newline
@@ -49,25 +50,30 @@ async function duplicateSystemYaml() {
 }
 
 function restartLCUWithOverride(LCUData) {
-    return new Promise(async (resolve, reject) => {
+    return new Promise(async (resolve) => {
         const LCUExePath = await getLCUExecutableFromProcess();
-        const LCUDir = IS_WIN ? path.dirname(LCUExePath) : path.dirname(LCUExePath) + '/../../..';
+        const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
         const overrideSystemFile = path.join(LCUDir, 'Config', 'rift-explorer', 'system.yaml');
-    
-        const { username, password, address, port } = LCUData;
-        
+
+        const {
+            username,
+            password,
+            address,
+            port,
+        } = LCUData;
+
         await requestPromise({
             strictSSL: false,
-            method: 'POST', 
+            method: 'POST',
             uri: `https://${username}:${password}@${address}:${port}/process-control/v1/process/quit`,
         });
-        
+
         // Give it some time to do cleanup
         setTimeout(() => {
             const leagueProcess = spawn(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`], {
                 cwd: LCUDir,
                 detached: true,
-                stdio: 'ignore'
+                stdio: 'ignore',
             });
 
             leagueProcess.unref();

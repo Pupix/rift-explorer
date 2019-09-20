@@ -4,13 +4,18 @@ const DiscordRPC = require('discord-rpc');
 const {
     duplicateSystemYaml,
     restartLCUWithOverride,
- } = require('./util');
+} = require('./util');
 
 const connector = new LCUConnector();
 const { app, dialog } = electron;
 const { BrowserWindow } = electron;
 
-const root = __dirname + '/app';
+const root = `${__dirname}/app`;
+
+// Checking if the running executable is called electron
+// seems to be the most straightforward to do this
+// https://stackoverflow.com/a/39395885/4895858
+const isDev = process.execPath.search('electron') !== -1;
 
 const clientId = '616399159322214425';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
@@ -33,17 +38,17 @@ app.on('ready', () => {
         title: 'Rift Explorer',
         backgroundColor: '#303030',
         webPreferences: {
-          nodeIntegration: true
-        }
+            nodeIntegration: true,
+        },
     });
 
-    if (process.env.NODE_ENV === 'development') {
+    if (isDev) {
         mainWindow.openDevTools();
     }
 
     // Remove default menu
     mainWindow.setMenu(null);
-    mainWindow.loadURL('file://' + root + '/index.html');
+    mainWindow.loadURL(`file://${root}/index.html`);
 
     // Avoid white page on load.
     mainWindow.webContents.on('did-finish-load', () => {
@@ -78,11 +83,11 @@ app.on('ready', () => {
                 await duplicateSystemYaml();
                 const response = dialog.showMessageBoxSync({
                     type: 'info',
-                    buttons: [ 'Cancel', 'Ok' ],
+                    buttons: ['Cancel', 'Ok'],
                     title: 'Rift Explorer',
                     message: 'Rift Explorer needs to restart your League of Legends client to work properly',
                     cancelId: 0,
-                    noLink: true
+                    noLink: true,
                 });
 
                 if (!response) {
@@ -91,6 +96,8 @@ app.on('ready', () => {
                 }
 
                 await restartLCUWithOverride(LCUData);
+                // https://github.com/eslint/eslint/issues/11899
+                // eslint-disable-next-line require-atomic-updates
                 LCURestarted = true;
             } catch (error) {
                 console.error(error);
@@ -133,7 +140,7 @@ app.on('ready', () => {
 
     connector.start();
     rpc.login({ clientId }).catch(console.error);
- });
+});
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
