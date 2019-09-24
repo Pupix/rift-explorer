@@ -1,6 +1,8 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
 const DiscordRPC = require('discord-rpc');
+const request = require('request-promise');
+const https = require('https');
 const {
     duplicateSystemYaml,
     restartLCUWithOverride,
@@ -20,8 +22,6 @@ const isDev = process.execPath.search('electron') !== -1;
 const clientId = '616399159322214425';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
-
-let LCURestarted = false;
 
 app.commandLine.appendSwitch('--ignore-certificate-errors');
 
@@ -68,15 +68,24 @@ app.on('ready', () => {
     });
 
     connector.on('connect', async (data) => {
+        let swaggerEnabled = false;
+
         // During multiple restarts of the client the backend server is not instantly
         // ready to serve requests so we delay a bit
         setTimeout(async () => {
             LCUData = data;
 
+            const { username, password, address, port } = LCUData;
+            await request({
+                url: `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`,
+                agent: new https.Agent({rejectUnauthorized: false})
+            })
+            .then(() => swaggerEnabled = true)
+            .catch(() => {});
+
             try {
-                if (LCURestarted) {
+                if (swaggerEnabled) {
                     mainWindow.webContents.send('lcu-load', LCUData);
-                    LCURestarted = false;
                     return;
                 }
 
@@ -98,7 +107,7 @@ app.on('ready', () => {
                 await restartLCUWithOverride(LCUData);
                 // https://github.com/eslint/eslint/issues/11899
                 // eslint-disable-next-line require-atomic-updates
-                LCURestarted = true;
+                swaggerEnabled = true;
             } catch (error) {
                 console.error(error);
                 // No error handling for now
