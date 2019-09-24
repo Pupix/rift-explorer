@@ -1,8 +1,7 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
 const DiscordRPC = require('discord-rpc');
-const request = require('request-promise');
-const https = require('https');
+const requestPromise = require('request-promise');
 const {
     duplicateSystemYaml,
     restartLCUWithOverride,
@@ -76,9 +75,9 @@ app.on('ready', () => {
             LCUData = data;
 
             const { username, password, address, port } = LCUData;
-            await request({
+            await requestPromise({
+                strictSSL: false,
                 url: `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`,
-                agent: new https.Agent({rejectUnauthorized: false})
             })
             .then(() => swaggerEnabled = true)
             .catch(() => {});
