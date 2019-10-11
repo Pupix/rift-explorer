@@ -1,9 +1,11 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
 const DiscordRPC = require('discord-rpc');
+const request = require('request-promise');
 const {
     duplicateSystemYaml,
     restartLCUWithOverride,
+    getOverrideFilePath,
 } = require('./util');
 
 const connector = new LCUConnector();
@@ -20,8 +22,6 @@ const isDev = process.execPath.search('electron') !== -1;
 const clientId = '616399159322214425';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
-
-let LCURestarted = false;
 
 app.commandLine.appendSwitch('--ignore-certificate-errors');
 
@@ -67,43 +67,72 @@ app.on('ready', () => {
         mainWindow = null;
     });
 
-    connector.on('connect', async (data) => {
-        // During multiple restarts of the client the backend server is not instantly
-        // ready to serve requests so we delay a bit
-        setTimeout(async () => {
-            LCUData = data;
+    async function f(data, auth) {
+        try {
+            request.get({
+                url: `https://127.0.0.1:${data.port}/data-store/v1/install-dir`,
+                strictSSL: false,
+                headers: {
+                    Authorization: `Basic ${auth}`,
+                },
+            }).then(() => {
+                mainWindow.webContents.send('lcu-load', data);
+            }).catch(() => {
+                throw new Error('API not ready');
+            });
+        } catch (e) {
+            console.log('API isn\'t ready yet giving it more time...');
+            setTimeout(() => {
+                f();
+            }, 2500);
+        }
+    }
 
-            try {
-                if (LCURestarted) {
-                    mainWindow.webContents.send('lcu-load', LCUData);
-                    LCURestarted = false;
-                    return;
+    async function checkArgs(data, auth) {
+        try {
+            request.get({
+                url: `https://127.0.0.1:${data.port}/riotclient/command-line-args`,
+                strictSSL: false,
+                headers: {
+                    Authorization: `Basic ${auth}`,
+                },
+            }).then(async (cmdlineargs) => {
+                const arr = JSON.parse(cmdlineargs);
+                if (arr.includes(`--system-yaml-override=${await getOverrideFilePath()}`)) {
+                    mainWindow.webContents.send('lcu-load', data);
+                } else {
+                    await duplicateSystemYaml();
+                    const response = dialog.showMessageBoxSync({
+                        type: 'info',
+                        buttons: ['Cancel', 'Ok'],
+                        title: 'Rift Explorer',
+                        message: 'Rift Explorer needs to restart your League of Legends client to work properly',
+                        cancelId: 0,
+                        noLink: true,
+                    });
+
+                    if (!response) {
+                        mainWindow.close();
+                        return;
+                    }
+                    await restartLCUWithOverride(data)
+                        .then(async () => {
+                            await f(data, auth);
+                        });
                 }
+            }).catch();
+        } catch (e) {
+            console.log('API isn\'t ready yet giving it more time...');
+            setTimeout(() => {
+                checkArgs(data, auth);
+            }, 2500);
+        }
+    }
 
-                await duplicateSystemYaml();
-                const response = dialog.showMessageBoxSync({
-                    type: 'info',
-                    buttons: ['Cancel', 'Ok'],
-                    title: 'Rift Explorer',
-                    message: 'Rift Explorer needs to restart your League of Legends client to work properly',
-                    cancelId: 0,
-                    noLink: true,
-                });
-
-                if (!response) {
-                    mainWindow.close();
-                    return;
-                }
-
-                await restartLCUWithOverride(LCUData);
-                // https://github.com/eslint/eslint/issues/11899
-                // eslint-disable-next-line require-atomic-updates
-                LCURestarted = true;
-            } catch (error) {
-                console.error(error);
-                // No error handling for now
-            }
-        }, 5000);
+    connector.on('connect', (data) => {
+        const auth = Buffer.from(`${data.username}:${data.password}`)
+            .toString('base64');
+        checkArgs(data, auth);
     });
 
     connector.on('disconnect', () => {
@@ -124,27 +153,32 @@ app.on('ready', () => {
             largeImageKey: 'rift',
             largeImageText: 'Rift Explorer',
             instance: false,
-        }).catch(console.error);
+        })
+            .catch(console.error);
     }
 
     rpc.on('ready', () => {
-        setActivity().catch(console.error);
+        setActivity()
+            .catch(console.error);
 
         // activity can only be set every 15 seconds
         setInterval(() => {
-            setActivity().catch(console.error);
+            setActivity()
+                .catch(console.error);
         }, 15e3);
     });
 
     rpc.on('error', console.error);
 
     connector.start();
-    rpc.login({ clientId }).catch(console.error);
+    rpc.login({ clientId })
+        .catch(console.error);
 });
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        rpc.destroy().catch(console.error);
+        rpc.destroy()
+            .catch(console.error);
         app.quit();
     }
 });
