@@ -33,14 +33,14 @@
 
         <script type="text/javascript">
             const IPC = require('electron').ipcRenderer;
-            const shell = require('electron').shell;
+            const { shell } = require('electron');
             const pkg = require('../package');
 
             const swaggerContainer = document.querySelector('#swagger-ui-container');
             const messageBar = document.querySelector('#message-bar');
 
             let LCUData = null;
-            let swaggerDisabled = true;
+            const swaggerDisabled = true;
 
             // We all love global variables
             window.RE = {
@@ -48,32 +48,34 @@
                     title: 'Rift Explorer',
                     description: pkg.description,
                     version: pkg.version,
-                }
+                },
             };
 
             const loadSwagger = () => {
-                const { username, password, address, port } = LCUData;
+                const {
+        username, password, address, port,
+    } = LCUData;
                 const header = `Basic ${btoa(`${username}:${password}`)}`;
-                const auth = new SwaggerClient.ApiKeyAuthorization("Authorization", header, "header");
+                const auth = new SwaggerClient.ApiKeyAuthorization('Authorization', header, 'header');
 
                 window.swaggerUi = new SwaggerUi({
                     validatorUrl: null,
                     url: `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`,
                     authorizations: { riot: auth },
-                    dom_id: "swagger-ui-container",
+                    dom_id: 'swagger-ui-container',
                     onComplete() {
                         document.querySelectorAll('pre code').forEach((block) => {
                             hljs.highlightBlock(block);
                         });
 
-                        window.swaggerUi.api.clientAuthorizations.add("riot", auth);
+                        window.swaggerUi.api.clientAuthorizations.add('riot', auth);
                     },
                     // Failure has been taken care of in the swagger-ui file
-                    docExpansion: "none",
+                    docExpansion: 'none',
                     jsonEditor: false,
-                    apisSorter: "alpha",
+                    apisSorter: 'alpha',
                     defaultModelRendering: 'schema',
-                    showRequestHeaders: true
+                    showRequestHeaders: true,
                 });
 
                 window.swaggerUi.load();
