@@ -101,6 +101,14 @@ app.on('ready', () => {
                     mainWindow.close();
                     return;
                 }
+            }).catch();
+        } catch (e) {
+            console.log('API isn\'t ready yet giving it more time...');
+            setTimeout(() => {
+                checkArgs(data, auth);
+            }, 2500);
+        }
+    }
 
                 await restartLCUWithOverride(data);
             }
