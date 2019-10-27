@@ -26,6 +26,13 @@ function getLCUExecutableFromProcess() {
     });
 }
 
+async function getOverrideFilePath() {
+    const LCUExePath = await getLCUExecutableFromProcess();
+    const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
+
+    return path.join(LCUDir, 'Config', 'rift-explorer', 'system.yaml');
+}
+
 async function duplicateSystemYaml() {
     const LCUExePath = await getLCUExecutableFromProcess();
     const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
@@ -53,7 +60,6 @@ function restartLCUWithOverride(LCUData) {
     return new Promise(async (resolve) => {
         const LCUExePath = await getLCUExecutableFromProcess();
         const LCUDir = IS_WIN ? path.dirname(LCUExePath) : `${path.dirname(LCUExePath)}/../../..`;
-        const overrideSystemFile = path.join(LCUDir, 'Config', 'rift-explorer', 'system.yaml');
 
         const {
             username,
@@ -69,8 +75,8 @@ function restartLCUWithOverride(LCUData) {
         });
 
         // Give it some time to do cleanup
-        setTimeout(() => {
-            const leagueProcess = spawn(LCUExePath.trim(), [`--system-yaml-override=${overrideSystemFile}`], {
+        setTimeout(async () => {
+            const leagueProcess = spawn(LCUExePath.trim(), [`--system-yaml-override=${await getOverrideFilePath()}`], {
                 cwd: LCUDir,
                 detached: true,
                 stdio: 'ignore',
@@ -86,4 +92,5 @@ module.exports = {
     getLCUExecutableFromProcess,
     duplicateSystemYaml,
     restartLCUWithOverride,
+    getOverrideFilePath,
 };
