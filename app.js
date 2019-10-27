@@ -9,7 +9,7 @@ const {
 } = require('./util');
 
 const connector = new LCUConnector();
-const { app, dialog } = electron;
+const { app, dialog, Menu } = electron;
 const { BrowserWindow } = electron;
 
 const root = `${__dirname}/app`;
@@ -47,7 +47,7 @@ app.on('ready', () => {
     }
 
     // Remove default menu
-    mainWindow.setMenu(null);
+    Menu.setApplicationMenu(null);
     mainWindow.loadURL(`file://${root}/index.html`);
 
     // Avoid white page on load.
