@@ -23,10 +23,11 @@ const clientId = '616399159322214425';
 const rpc = new DiscordRPC.Client({ transport: 'ipc' });
 const startTimestamp = new Date();
 
+let mainWindow = null;
+
 app.commandLine.appendSwitch('--ignore-certificate-errors');
 
 app.on('ready', () => {
-    let mainWindow = null;
     let windowLoaded = false;
     let LCUData = null;
 
@@ -42,9 +43,7 @@ app.on('ready', () => {
         },
     });
 
-    if (isDev) {
-        mainWindow.openDevTools();
-    }
+    if (isDev) mainWindow.openDevTools();
 
     // Remove default menu
     Menu.setApplicationMenu(null);
@@ -53,12 +52,9 @@ app.on('ready', () => {
     // Avoid white page on load.
     mainWindow.webContents.on('did-finish-load', () => {
         windowLoaded = true;
-
         mainWindow.show();
 
-        if (!LCUData) {
-            return;
-        }
+        if (!LCUData) return;
 
         mainWindow.webContents.send('lcu-load', LCUData);
     });
@@ -75,7 +71,6 @@ app.on('ready', () => {
                 Authorization: `Basic ${auth}`,
             },
         });
-
         const cmdLineArgs = JSON.parse(rawCmdLineArgs);
 
         return cmdLineArgs.includes(`--system-yaml-override=${await getOverrideFilePath()}`);
@@ -102,6 +97,7 @@ app.on('ready', () => {
                     return;
                 }
 
+                mainWindow.webContents.send('restarting-league');
                 await restartLCUWithOverride(data);
             }
         } catch (e) {
@@ -119,48 +115,40 @@ app.on('ready', () => {
 
     connector.on('disconnect', () => {
         LCUData = null;
-
-        if (windowLoaded) {
-            mainWindow.webContents.send('lcu-unload');
-        }
+        if (windowLoaded) mainWindow.webContents.send('lcu-unload');
     });
 
     async function setActivity() {
-        if (!rpc || !mainWindow) {
-            return;
-        }
+        if (!rpc || !mainWindow) return;
 
         rpc.setActivity({
             startTimestamp,
             largeImageKey: 'rift',
             largeImageText: 'Rift Explorer',
             instance: false,
-        })
-            .catch(console.error);
+        }).catch(console.error);
     }
 
     rpc.on('ready', () => {
-        setActivity()
-            .catch(console.error);
+        setActivity().catch(console.error);
 
         // activity can only be set every 15 seconds
         setInterval(() => {
-            setActivity()
-                .catch(console.error);
+            setActivity().catch(console.error);
         }, 15e3);
     });
 
     rpc.on('error', console.error);
 
     connector.start();
-    rpc.login({ clientId })
-        .catch(console.error);
+    rpc.login({ clientId }).catch(console.error);
 });
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        rpc.destroy()
-            .catch(console.error);
+        rpc.destroy().catch(console.error);
         app.quit();
     }
 });
+
+module.exports = { mainWindow };
