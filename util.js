@@ -4,6 +4,7 @@ const fs = require('fs-extra');
 const yaml = require('yaml');
 const { spawn } = require('child_process');
 const requestPromise = require('request-promise');
+const { mainWindow } = require('./app');
 
 const IS_WIN = process.platform === 'win32';
 const LEAGUE_PROCESS = IS_WIN ? 'LeagueClient.exe' : 'LeagueClient';
@@ -16,10 +17,10 @@ function getLCUExecutableFromProcess() {
 
         cp.exec(command, (error, stdout, stderr) => {
             if (error || !stdout || stderr) {
+                if (IS_WIN) mainWindow.webContents.send('no-wmic');
                 reject(error || stderr);
                 return;
             }
-
             const normalizedPath = path.normalize(stdout);
             resolve(IS_WIN ? normalizedPath.split(/\n|\n\r/)[1] : normalizedPath);
         });
@@ -41,9 +42,7 @@ async function duplicateSystemYaml() {
     const overrideSystemFile = path.join(LCUDir, 'Config', 'rift-explorer', 'system.yaml');
 
     // File doesn't exist, do nothing
-    if (!(await fs.exists(originalSystemFile))) {
-        throw new Error('system.yaml not found');
-    }
+    if (!(await fs.exists(originalSystemFile))) throw new Error('system.yaml not found');
 
     const file = await fs.readFile(originalSystemFile, 'utf8');
     const fileParsed = yaml.parseDocument(file);
@@ -52,8 +51,13 @@ async function duplicateSystemYaml() {
     fileParsed.set('enable_swagger', true);
 
     const stringifiedFile = yaml.stringify(fileParsed);
+
     // Rito's file is prefixed with --- newline
-    await fs.outputFile(overrideSystemFile, `---\n${stringifiedFile}`);
+    try {
+        await fs.outputFile(overrideSystemFile, `---\n${stringifiedFile}`);
+    } catch (e) {
+        mainWindow.webContents.send('cant-write');
+    }
 }
 
 function restartLCUWithOverride(LCUData) {
