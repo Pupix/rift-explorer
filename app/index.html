@@ -28,7 +28,7 @@
     </head>
 
     <body class="swagger-section">
-        <div id="message-bar" class="swagger-ui-wrap" data-sw-translate>Waiting for League to start...</div>
+        <div id="message-bar" class="swagger-ui-wrap breath noselect" data-sw-translate>Waiting for League to start...</div>
         <div id="swagger-ui-container" class="swagger-ui-wrap"></div>
 
         <script type="text/javascript">
@@ -84,6 +84,18 @@
             IPC.on('lcu-load', (event, data) => {
                 LCUData = data;
                 loadSwagger();
+            });
+
+            IPC.on('restarting-league', () => {
+                messageBar.innerHTML = 'Restarting League...';
+            });
+
+            IPC.on('no-wmic', () => {
+                messageBar.innerHTML = 'ERROR: WMIC unavailable.';
+            });
+
+            IPC.on('cant-write', () => {
+                messageBar.innerHTML = 'ERROR: Unable to write to the league directory.';
             });
 
             IPC.on('lcu-unload', () => {

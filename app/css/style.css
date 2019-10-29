@@ -1,6 +1,32 @@
+@keyframes breath {
+    0% {
+        color: rgba(255,255,255,0.85);
+    }
+    50% {
+        color: rgba(255,255,255,0.25);
+    }
+    100% {
+        color: rgba(255,255,255,0.85);
+    }
+}
+
 html {
   background: #303030;
   color: #FFFFFF;
+}
+
+.breath {
+    animation-name: breath;
+    animation-direction: normal;
+    animation-fill-mode: both;
+    animation-iteration-count: infinite;
+    animation-timing-function: ease-in-out;
+    animation-duration: 2s;
+}
+
+.noselect {
+    cursor: default;
+    pointer-events: none;
 }
 
 .swagger-section .logo {
