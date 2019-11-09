@@ -10,16 +10,15 @@
   "author": "Robert Manolea <manolea.robert@gmail.com>",
   "license": "MIT",
   "dependencies": {
-    "discord-rpc": "^3.1.0",
     "fs-extra": "^8.1.0",
     "lcu-connector": "^2.1.2",
     "request": "^2.88.0",
-    "request-promise": "^4.2.4",
+    "request-promise": "^4.2.5",
     "yaml": "^1.7.2"
   },
   "devDependencies": {
-    "electron": "^7.0.0",
-    "electron-builder": "^21.2.0",
+    "electron": "^7.1.1",
+    "electron-builder": "^22.1.0",
     "eslint": "^6.6.0",
     "eslint-config-airbnb-base": "^14.0.0",
     "eslint-plugin-html": "^6.0.0",
