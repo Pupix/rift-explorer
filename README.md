@@ -15,7 +15,7 @@ Prebuilt binaries for Windows and MacOS can be found [here](https://github.com/P
 
 _Note: 32-bit binaries are not provided. For 32-bit binaries please build them using the instructions below._
 
-### Build from source
+### Run from source
 
 **Note:** [NodeJS](https://nodejs.org) is needed to build rift-explorer
 
@@ -29,6 +29,25 @@ _Note: 32-bit binaries are not provided. For 32-bit binaries please build them u
 
 4. Start Rift Explorer
 `yarn start` or `npm run start`
+
+### Run from source
+
+**Note:** [NodeJS](https://nodejs.org) is needed to build rift-explorer
+
+1. Clone repository
+`git clone https://github.com/Pupix/rift-explorer.git`
+
+2. Install dependencies
+`yarn install` or `npm install`
+
+3. Start League of Legends
+
+4. Start Rift Explorer
+`yarn build` or `npm run build`
+
+5. Get the binaries
+The built binaries should be in `dist/<operating system name>/`
+
 
 ### Screenshot
 
