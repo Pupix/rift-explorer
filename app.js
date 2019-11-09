@@ -1,6 +1,5 @@
 const electron = require('electron');
 const LCUConnector = require('lcu-connector');
-const DiscordRPC = require('discord-rpc');
 const request = require('request-promise');
 const {
     duplicateSystemYaml,
@@ -18,10 +17,6 @@ const root = `${__dirname}/app`;
 // seems to be the most straightforward to do this
 // https://stackoverflow.com/a/39395885/4895858
 const isDev = process.execPath.search('electron') !== -1;
-
-const clientId = '616399159322214425';
-const rpc = new DiscordRPC.Client({ transport: 'ipc' });
-const startTimestamp = new Date();
 
 let mainWindow = null;
 
@@ -110,7 +105,7 @@ app.on('ready', () => {
     connector.on('connect', (data) => {
         const auth = Buffer.from(`${data.username}:${data.password}`)
             .toString('base64');
-        checkArgs(data, auth);
+        checkArgs(data, auth).catch(console.error);
     });
 
     connector.on('disconnect', () => {
@@ -118,35 +113,11 @@ app.on('ready', () => {
         if (windowLoaded) mainWindow.webContents.send('lcu-unload');
     });
 
-    async function setActivity() {
-        if (!rpc || !mainWindow) return;
-
-        rpc.setActivity({
-            startTimestamp,
-            largeImageKey: 'rift',
-            largeImageText: 'Rift Explorer',
-            instance: false,
-        }).catch(console.error);
-    }
-
-    rpc.on('ready', () => {
-        setActivity().catch(console.error);
-
-        // activity can only be set every 15 seconds
-        setInterval(() => {
-            setActivity().catch(console.error);
-        }, 15e3);
-    });
-
-    rpc.on('error', console.error);
-
     connector.start();
-    rpc.login({ clientId }).catch(console.error);
 });
 
 app.on('window-all-closed', () => {
     if (process.platform !== 'darwin') {
-        rpc.destroy().catch(console.error);
         app.quit();
     }
 });
