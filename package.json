@@ -1,33 +1,90 @@
 {
   "name": "rift-explorer",
-  "version": "6.3.0",
+  "version": "7.0.0",
   "description": "Always up to date documentation for the League Client API",
-  "main": "app.js",
-  "scripts": {
-    "start": "electron app",
-    "build": "electron-builder --dir"
+  "author": {
+    "name": "Robert Manolea",
+    "email": "manolea.robert@gmail.com",
+    "url": "https://github.com/pupix"
   },
-  "author": "Robert Manolea <manolea.robert@gmail.com>",
+  "contributors": [
+    {
+      "name": "Ray",
+      "email": "dev@hiray.me",
+      "url": "https://hiray.me/"
+    },
+    {
+      "name": "Morilli",
+      "url": "https://github.com/Morilli"
+    }
+  ],
   "license": "MIT",
+  "private": true,
+  "main": "build/app/main.js",
   "dependencies": {
-    "discord-rpc": "^3.0.2",
-    "fs-extra": "^8.1.0",
-    "lcu-connector": "^2.1.2",
-    "request": "^2.88.0",
-    "request-promise": "^4.2.4",
-    "yaml": "^1.6.0"
+    "electron": "^11.0.4",
+    "electron-better-ipc": "^1.1.1",
+    "lcu-connector": "^2.1.3",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
+    "react-scripts": "4.0.1",
+    "swagger-ui-react": "^3.37.2",
+    "typescript": "^4.0.3"
   },
-  "devDependencies": {
-    "electron": "^6.0.5",
-    "electron-builder": "^21.2.0",
-    "eslint": "^6.4.0",
-    "eslint-config-airbnb-base": "^14.0.0",
-    "eslint-plugin-html": "^6.0.0",
-    "eslint-plugin-import": "^2.18.2",
-    "eslint-plugin-node": "^10.0.0"
+  "scripts": {
+    "dev": "tsc -p app && concurrently \"cross-env BROWSER=none NODE_ENV=development yarn react:start\" \"wait-on http://localhost:3000/ && electron ./build/app/main.js\"",
+    "react:start": "rescripts start",
+    "react:build": "rescripts build",
+    "postinstall": "electron-builder install-app-deps",
+    "preelectron-pack": "yarn build",
+    "electron-pack": "build -mw",
+    "format": "prettier --write src/**/*.ts{,x}",
+    "lint": "tsc --noEmit && eslint src/**/*.ts{,x}"
   },
   "build": {
+    "appId": "com.rift-explorer",
     "productName": "Rift Explorer",
-    "appId": "com.rift-explorer"
+    "mac": {
+      "category": "public.app-category.developer-tools"
+    },
+    "directories": {
+      "buildResources": "assets"
+    },
+    "extends": null
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@rescripts/cli": "^0.0.14",
+    "@rescripts/rescript-env": "^0.0.12",
+    "@types/node": "^14.14.11",
+    "@types/react": "^17.0.0",
+    "@types/swagger-ui-react": "^3.35.0",
+    "@typescript-eslint/eslint-plugin": "^4.9.1",
+    "@typescript-eslint/parser": "^4.9.1",
+    "concurrently": "^5.3.0",
+    "cross-env": "^7.0.3",
+    "electron-builder": "^22.9.1",
+    "eslint": "^7.11.0",
+    "eslint-config-airbnb": "18.2.1",
+    "eslint-config-airbnb-typescript": "^12.0.0",
+    "eslint-config-prettier": "^7.0.0",
+    "eslint-plugin-import": "2.22.1",
+    "eslint-plugin-jsx-a11y": "6.4.1",
+    "eslint-plugin-prettier": "^3.2.0",
+    "eslint-plugin-react": "7.21.5",
+    "eslint-plugin-react-hooks": "4.0.0",
+    "prettier": "^2.2.1",
+    "wait-on": "^5.2.0"
   }
 }
