@@ -1,0 +1,54 @@
+.app-close__win {
+  color: crimson;
+  font-size: 1rem;
+
+  text-align: center;
+
+  position: fixed;
+  top: 1%;
+  left: 1%;
+  font-weight: bolder;
+  cursor: pointer;
+  -webkit-user-drag: none;
+}
+
+.app-close__win:hover {
+  opacity: 75%;
+  -webkit-user-drag: none;
+}
+
+.app-close__macos {
+  color: crimson;
+  font-size: 1rem;
+
+  text-align: center;
+
+  position: fixed;
+
+  top: 1%;
+  right: 1%;
+
+  transition-duration: 250ms;
+  -webkit-user-drag: none;
+  transition-timing-function: ease-in-out;
+}
+
+.app-close__macos:hover {
+  opacity: 75%;
+
+  transition-duration: 250ms;
+  transition-timing-function: ease-in-out;
+  -webkit-user-drag: none;
+
+}
+
+.app-close__macos-button {
+  padding: 1rem;
+  background-color: crimson;
+  cursor: pointer;
+  -webkit-user-drag: none;
+}
+
+.app-close {
+  -webkit-user-drag: none;
+}

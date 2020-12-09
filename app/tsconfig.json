@@ -1,0 +1,11 @@
+{
+  "compilerOptions": {
+    "target": "es2020",
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "rootDir": "./",
+    "outDir": "../build/app"
+  }
+}

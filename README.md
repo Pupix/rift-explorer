@@ -11,15 +11,15 @@ Prebuilt binaries for Windows can be found [here](https://github.com/Pupix/rift-
 ### Build from source
 
 1. Clone repository
-`git clone https://github.com/Pupix/rift-explorer.git`
+   `git clone https://github.com/Pupix/rift-explorer.git`
 
 2. Install dependencies
-`yarn install` or `npm install`
+   `yarn install` or `npm install`
 
 3. Start League of Legends
 
 4. Start Rift Explorer
-`yarn start` or `npm run start`
+   `yarn dev` or `npm run dev`
 
 ### Screenshot
 

@@ -1,0 +1,70 @@
+@keyframes breathe-logo {
+  0% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.75));
+  }
+
+  25% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.6));
+  }
+
+  35% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.4));
+  }
+
+  50% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.6));
+  }
+
+  75% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.4));
+  }
+
+  85% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.6));
+  }
+
+  100% {
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.75));
+  }
+}
+
+.re-loading {
+  width: 100vw;
+  height: 100vh;
+
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-content: center;
+  align-items: center;
+
+  text-align: center;
+
+  font-size: calc(1em + 1vw);
+
+  animation: ease-in-out 1400ms forwards infinite running bg;
+
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.re-loading__text {
+  font-size: 2rem;
+
+  animation: ease 1.4s forwards infinite running breathe;
+  font-weight: lighter;
+  user-select: none;
+  -webkit-user-drag: none;
+
+  opacity: 0.2;
+}
+
+.re-loading__logo {
+  width: 25%;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+  animation: ease 3s forwards infinite running breathe-logo;
+  filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.75));
+}
