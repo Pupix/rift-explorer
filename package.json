@@ -84,6 +84,7 @@
     "eslint-plugin-prettier": "^3.2.0",
     "eslint-plugin-react": "7.21.5",
     "eslint-plugin-react-hooks": "4.0.0",
+    "node-sass": "^4.0.0",
     "prettier": "^2.2.1",
     "wait-on": "^5.2.0"
   }

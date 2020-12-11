@@ -1,0 +1,191 @@
+$buttonsize: 0.6rem
+
+@keyframes :global(breathe-logo)
+  0%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.75))
+
+  25%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.6))
+
+  35%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.4))
+
+  50%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.6))
+
+  75%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.4))
+
+  85%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.6))
+
+  100%
+    filter: drop-shadow(0px 0px 20px rgba(255,255,255,0.75))
+
+.titlebar_macos
+  width: 100%
+  height: 2rem
+
+  position: fixed
+
+  display: flex
+  flex-direction: row
+  z-index: 99999
+.opblock-tag
+  border-top: 2px solid white
+  border-bottom: 2px solid white
+.titlebar_win
+  width: 100%
+  height: 2rem
+
+  position: fixed
+
+  top: 0
+  background-color: #303030
+
+  display: flex
+  flex-direction: row-reverse
+  -webkit-app-region: drag
+
+  border-bottom: 1px solid rgba(255,255,255,0.1)
+  z-index: 10000
+
+
+
+.deadzone
+  -webkit-app-region: drag
+
+  width: 75%
+
+.swaggercontainer
+  padding-top: 4rem
+
+.column
+  -webkit-app-region: drag
+  position: relative
+  width: 100%
+  color: white
+  display: flex
+  justify-content: center
+  flex-direction: column
+  .logo
+    height: 100%
+    width: 9rem
+    display: flex
+    align-items: center
+    text-align: left
+    position: absolute
+    padding-left: 0.5rem
+    opacity: 0.5
+    color: rgba(255,255,255,0.2)
+    img
+      width: auto
+      height: 60%
+      padding: 5%
+
+.buttons_win
+  display: flex
+  flex-direction: row
+
+.buttons_mac
+  display: flex
+  flex-direction: row
+  justify-content: center
+  align-items: center
+
+.buttons_close
+  padding: $buttonsize
+  border-radius: 100vw
+  margin: 5% 0.7%
+  background-color: crimson
+  -webkit-app-region: no-drag
+  opacity: 0.9
+  transition-duration: 150ms
+  &:hover
+    opacity: 0.5
+
+.rifticons
+  opacity: 0.5
+  cursor: pointer
+  transition-duration: 250ms
+  filter: drop-shadow(0px 0px 1rem transparent)
+  -webkit-user-drag: none
+  &:hover
+    transition-duration: 250ms
+    filter: drop-shadow(0px 0px 0.5vw white)
+    opacity: 1
+
+.riftcontainer
+  width: fit-content
+  display: flex
+  justify-content: center
+  flex-direction: column
+
+.riftname
+  display: flex
+  justify-content: center
+  align-items: center
+  text-align: center
+  flex-direction: column
+  font-family: 'roboto', sans-serif
+  font-weight: bolder
+  font-size: 3rem
+  color: rgba(255,255,255,0.8)
+  padding-bottom: 1rem
+  user-select: none
+  -webkit-user-drag: none
+
+.riftslogan
+  padding-top: 1rem
+  font-size: 1rem
+  color: rgba(255,255,255,0.2)
+.riftlogo
+  user-select: none
+  -webkit-user-drag: none
+  &:global
+    animation: ease 3s forwards infinite running breathe-logo
+.riftinfo
+  width: 100%
+  padding-bottom: 2rem
+  display: flex
+  flex-direction: column
+  justify-content: center
+  align-items: center
+
+  div
+    display: flex
+    justify-content: center
+    align-items: center
+    width: 100%
+    padding-top: 1.5rem
+    align-content: center
+    img
+      width: 3rem
+      margin: 0 1rem
+
+.buttons_minmax
+  padding: $buttonsize
+  border-radius: 100vw
+  margin: 5% 0.7%
+  background-color: mediumseagreen
+  -webkit-app-region: no-drag
+  opacity: 0.9
+  transition-duration: 150ms
+  &:hover
+    opacity: 0.5
+    transition-duration: 150ms
+
+.buttons_min
+  padding: $buttonsize
+  border-radius: 100vw
+  margin: 5% 0.7%
+  background-color: coral
+  -webkit-app-region: no-drag
+  opacity: 0.9
+  transition-duration: 150ms
+  &:hover
+    opacity: 0.5
+    transition-duration: 150ms
+
+.spacer
+  width: 100%
