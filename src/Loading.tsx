@@ -1,20 +1,36 @@
 import React from "react";
 
+import Prompt from "./Prompt";
+
 import Logo from "./images/logo.png";
 
-import "./css/loading.css";
+import styles from "./stylesheets/sass/loading.module.sass";
 
 interface LoadingInterface {
   message: string;
+  prompt: boolean;
+  promptSetter: any;
 }
 
-const Loading = ({ message }: LoadingInterface) => {
+const Loading = ({
+  message,
+  prompt,
+  promptSetter,
+}: LoadingInterface): React.ReactElement => {
   return (
-    <div className="re-loading">
-      <img className="re-loading__logo" src={Logo} alt="Rift Explorer logo" />
+    <div className={styles.loading}>
+      <img
+        className={styles.loading_logo}
+        src={Logo}
+        alt="Rift Explorer logo"
+      />
       <br />
       <br />
-      <div className="re-loading__text">{message}</div>
+      {prompt ? (
+        <Prompt answer={promptSetter} />
+      ) : (
+        <div className={styles.loading_text}>{message}</div>
+      )}
     </div>
   );
 };
