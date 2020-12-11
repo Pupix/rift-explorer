@@ -3,7 +3,6 @@ import { platform } from "os";
 import { app, BrowserWindow, ipcMain as ipc } from "electron";
 
 import axios from "axios";
-import LCUConnector from "lcu-connector";
 import * as path from "path";
 
 const instance = axios.create({
@@ -19,7 +18,6 @@ const IS_DEV: boolean = require.main.filename.indexOf("app.asar") === -1;
 const ROOT = `${__dirname}/app`;
 
 const riotconnector = new RiotConnector();
-const connector = new LCUConnector();
 let swaggerJson: any;
 
 const agent: Agent = new Agent({
@@ -79,13 +77,12 @@ function createWindow() {
 
     console.log("Got here!");
     console.log(leaguePath);
-    const systemYamlPath = path.join(path.dirname(leaguePath), "system.yaml");
+    const systemYamlPath = path.join(leaguePath, "system.yaml");
 
     modifySystemYaml(systemYamlPath);
   });
 
-  connector.on("connect", async (data) => {
-    riotconnector.stop();
+  riotconnector.on("leagueclient", async (data) => {
     console.log("initial lcu connect");
     let swaggerEnabled = false;
 
@@ -105,7 +102,7 @@ function createWindow() {
           swaggerJson = res.data;
           swaggerEnabled = true;
         })
-        .catch(console.error);
+        .catch(() => {console.log("Swagger request failed; assuming swagger is not enabled.")});
 
       // console.log(swaggerEnabled);
       if (swaggerEnabled) {
@@ -122,9 +119,8 @@ function createWindow() {
     .catch(console.error);
   });
 
-  connector.on("disconnect", () => {
+  riotconnector.on("disconnect", () => {
     LCUData = null;
-    riotconnector.start();
 
     if (windowLoaded) {
       mainWindow?.webContents.send("LCUDISCONNECT");
@@ -150,7 +146,6 @@ function createWindow() {
   });
 
   riotconnector.start();
-  connector.start();
 }
 
 app.on("ready", createWindow);
