@@ -1,18 +1,57 @@
-import { ChildProcess, exec, spawn } from "child_process";
+import { exec } from "child_process";
 import * as path from "path";
-import { dirname, join, normalize } from "path";
+import { normalize } from "path";
 import { outputFile, pathExists, readFile } from "fs-extra";
 import axios from "axios";
 import { Agent } from "https";
 import yaml, { Document } from "yaml";
 import { platform } from "os";
+const EventEmitter = require('events');
 
 const IS_WIN: boolean = platform() === "win32";
 const LEAGUE_PROCESS: string = IS_WIN ? "LeagueClient.exe" : "LeagueClient";
+const RIOTCLIENT_PROCESS: string = IS_WIN ? "RiotClientServices.exe" : "RiotClientServices";
 
-const agent: Agent = new Agent({
-  rejectUnauthorized: false,
+const instance = axios.create({
+  httpsAgent: new Agent({
+    rejectUnauthorized: false
+  })
 });
+
+export class RiotConnector extends EventEmitter {
+  constructor() {
+    super();
+
+    console.log("inited ritocon");
+  }
+
+  _checkRitoClient() {
+    const command = IS_WIN
+      ? `WMIC PROCESS WHERE name='${RIOTCLIENT_PROCESS}' GET CommandLine`
+      : `ps x -o comm= | grep '${RIOTCLIENT_PROCESS}$'`;
+
+    exec(command, (error, stdout, stderr) => {
+      if (error || !stdout || stderr) {
+        return;
+      }
+
+      let normalizedPath = normalize(stdout);
+      if (IS_WIN)
+        normalizedPath = normalizedPath.split(/\n|\n\r/)[1];
+      const match = normalizedPath.match("\"--priority-launch-path=(.*?)\"") || [];
+
+      this.emit("ritoclient", match[1]);
+    });
+  };
+
+  start() {
+    this._ritoClientWatch = setInterval(this._checkRitoClient.bind(this), 1000);
+  }
+
+  stop() {
+    clearInterval(this._ritoClientWatch);
+  }
+}
 
 function getLCUExecutableFromProcess(): Promise<void | string> {
   return new Promise((resolve, reject): void => {
@@ -32,41 +71,25 @@ function getLCUExecutableFromProcess(): Promise<void | string> {
   });
 }
 
-async function modifySystemYaml(): Promise<void> {
-  const LCUExePath: void | string = await getLCUExecutableFromProcess();
-  let LCUDir: string;
-
-  if (typeof LCUExePath === "string") {
-    LCUDir = IS_WIN ? dirname(LCUExePath) : `${dirname(LCUExePath)}/../../..`;
-  } else {
-    throw new Error("LCU exe path not found.");
-  }
-
-  const originalSystemFile: string = join(LCUDir, "system.yaml");
-
+export async function modifySystemYaml(path: string): Promise<void> {
   // File doesn't exist, do nothing
-  if (!(await pathExists(originalSystemFile))) {
+  if (!(await pathExists(path))) {
     throw new Error("system.yaml not found");
   }
 
-  const file: string = await readFile(originalSystemFile, "utf8");
+  const file: string = await readFile(path, "utf8");
   const fileParsed: Document.Parsed = yaml.parseDocument(file);
 
   fileParsed.set("enable_swagger", true);
 
   const stringifiedFile: string = yaml.stringify(fileParsed);
   // Rito's file is prefixed with --- newline
-  await outputFile(originalSystemFile, `---\n${stringifiedFile}`);
+  await outputFile(path, `---\n${stringifiedFile}`);
 }
 
-function restartLCUWithOverride(LCUData: {
-  username: string;
-  password: string;
-  address: string;
-  port: number;
-}): Promise<void> {
+export function restartLCU(LCUData: Record<string, string | number> | null): Promise<void> {
   return new Promise(
-    async (resolve): Promise<void> => {
+    async (): Promise<void> => {
       const LCUExePath: string | void = await getLCUExecutableFromProcess();
       let LCUDir: string;
 
@@ -80,28 +103,7 @@ function restartLCUWithOverride(LCUData: {
 
       const { username, password, address, port } = LCUData;
 
-      await axios.post(
-        `https://${username}:${password}@${address}:${port}/process-control/v1/process/quit`,
-        { httpsAgent: agent }
-      );
-
-      // Give it some time to do cleanup
-      setTimeout((): void => {
-        const leagueProcess: ChildProcess = spawn(LCUExePath.trim(), [``], {
-          cwd: LCUDir,
-          detached: true,
-          stdio: "ignore",
-        });
-
-        leagueProcess.unref();
-        resolve();
-      }, 5000);
+      await instance.delete(`https://${username}:${password}@${address}:${port}/lol-rso-auth/v1/session`);;;;;;;;;;;;;;;;;;;;;;;;
     }
   );
 }
-
-export {
-  getLCUExecutableFromProcess,
-  modifySystemYaml,
-  restartLCUWithOverride,
-};

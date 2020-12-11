@@ -1,17 +1,26 @@
 import { Agent } from "https";
 import { platform } from "os";
-import { app, BrowserWindow, dialog, ipcMain as ipc } from "electron";
+import { app, BrowserWindow, ipcMain as ipc } from "electron";
 
 import axios from "axios";
 import LCUConnector from "lcu-connector";
-import * as electron from "electron";
-import { removeAllListeners } from "cluster";
+import * as path from "path";
+
+const instance = axios.create({
+  httpsAgent: new Agent({
+    rejectUnauthorized: false
+  })
+});
+
+import { RiotConnector, modifySystemYaml, restartLCU } from "./util";
 
 const IS_WIN = platform() === "win32";
 const IS_DEV: boolean = require.main.filename.indexOf("app.asar") === -1;
 const ROOT = `${__dirname}/app`;
 
+const riotconnector = new RiotConnector();
 const connector = new LCUConnector();
+let swaggerJson: any;
 
 const agent: Agent = new Agent({
   rejectUnauthorized: false,
@@ -60,14 +69,25 @@ function createWindow() {
   });
 
   ipc.on("FEREADY", () => {
-    mainWindow?.webContents.send("BEPRELOAD", LCUData ? LCUData : "");
+    mainWindow?.webContents.send("BEPRELOAD", swaggerJson ? swaggerJson : "");
     ipc.removeAllListeners("FEREADY");
   });
 
-  connector.on("connect", async (data) => {
-    let swaggerEnabled = false;
+  riotconnector.on("ritoclient", (leaguePath: string | undefined) => {
+    if (!leaguePath)
+      return;
 
-    mainWindow?.webContents.send("LCUCONNECT", swaggerEnabled ? LCUData : {});
+    console.log("Got here!");
+    console.log(leaguePath);
+    const systemYamlPath = path.join(path.dirname(leaguePath), "system.yaml");
+
+    modifySystemYaml(systemYamlPath);
+  });
+
+  connector.on("connect", async (data) => {
+    riotconnector.stop();
+    console.log("initial lcu connect");
+    let swaggerEnabled = false;
 
     // During multiple restarts of the client the backend server is not instantly
     // ready to serve requests so we delay a bit
@@ -76,39 +96,35 @@ function createWindow() {
 
       const { username, password, address, port } = LCUData;
 
-      axios
+      await instance
         .get(
           `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`,
           { httpsAgent: agent }
         )
-        .then(() => {
+        .then((res) => {
+          swaggerJson = res.data;
           swaggerEnabled = true;
         })
         .catch(console.error);
 
-      try {
-        if (swaggerEnabled) {
-          mainWindow?.webContents.send("LCUCONNECT", LCUData ? LCUData : {});
-        }
-
-        ipc.on("PROMPTRESTART", () => {
-          // TODO: For morilli to fix util.ts
-          // await duplicateSystemYaml();
-
-          // TODO: For morilli to fix util.ts
-          // await restartLCUWithOverride(LCUData);
-
-          swaggerEnabled = true;
-        });
-      } catch (error) {
-        console.error(error);
-        // No error handling for now
+      // console.log(swaggerEnabled);
+      if (swaggerEnabled) {
+        mainWindow?.webContents.send("LCUCONNECT", swaggerJson);
+      } else {
+        mainWindow?.webContents.send("BELCUREQUESTGETRESTARTLCU");
       }
+
     }, 5000);
+  });
+
+  ipc.on("PROMPTRESTART", () => {
+    restartLCU(LCUData)
+    .catch(console.error);
   });
 
   connector.on("disconnect", () => {
     LCUData = null;
+    riotconnector.start();
 
     if (windowLoaded) {
       mainWindow?.webContents.send("LCUDISCONNECT");
@@ -133,6 +149,7 @@ function createWindow() {
     mainWindow.minimize();
   });
 
+  riotconnector.start();
   connector.start();
 }
 
