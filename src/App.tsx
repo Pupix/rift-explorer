@@ -27,12 +27,17 @@ const App = (): React.ReactElement => {
       console.log("closing window");
       ipc.send("program_close", "");
     } else if (promptAnswer === true) {
+      console.log("sent prompt restart");
       ipc.send("PROMPTRESTART", "");
     }
   }, [promptAnswer]);
 
   useEffect(() => {
     ipc.send("FEREADY", "");
+
+    ipc.on("BELCUREQUESTGETRESTARTLCU", () => {
+      setGivePrompt(true);
+    });
 
     ipc.on("BEPRELOAD", (event, data) => {
       console.warn(`DATA PRELOAD: >${data}<`);
@@ -52,8 +57,8 @@ const App = (): React.ReactElement => {
     });
 
     ipc.on("LCUDISCONNECT", (event, data) => {
-      console.log("League client disconnected attempting to reconnect");
-      setStatus("League client disconnected attempting to reconnect");
+      console.log("League client disconnected; attempting to reconnect");
+      setStatus("League client disconnected; attempting to reconnect");
       setGivePrompt(false);
       setPromptAnswer(null);
       setCredentials("");
@@ -139,7 +144,7 @@ const App = (): React.ReactElement => {
           <Swagger
             docExpansion="none"
             defaultModelExpandDepth={1}
-            url={`https://${credentials.username}:${credentials.password}@${credentials.address}:${credentials.port}/swagger/v2/swagger.json`}
+            spec={credentials}
           />
         </div>
       ) : (
