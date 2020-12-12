@@ -22,9 +22,9 @@
   "private": true,
   "main": "build/app/main.js",
   "dependencies": {
+    "axios": "^0.21.0",
     "electron": "^11.0.4",
-    "electron-better-ipc": "^1.1.1",
-    "lol-lockfile-parser": "^1.0.2",
+    "mixin-deep": "^2.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
     "react-scripts": "4.0.1",
