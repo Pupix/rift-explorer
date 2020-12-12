@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import Swagger from "swagger-ui-react";
 
-import electron from "electron";
+import { ipcRenderer as ipc } from "electron";
 
 import { platform } from "os";
 
@@ -12,16 +12,22 @@ import Logo from "./images/logo.png";
 import discord from "./images/discord.svg";
 import github from "./images/github.svg";
 
-const ipc = electron.ipcRenderer;
-
+/**
+ * Simple check to see if the platform is windows if not then assume it is macOS since that is the
+ * only other supported platform.
+ */
 const IS_WIN = platform() === "win32";
 
 const App = (): React.ReactElement => {
-  const [credentials, setCredentials]: any = useState("");
+  const [swaggerJson, setSwaggerJson]: any = useState("");
   const [givePrompt, setGivePrompt]: any = useState(false);
   const [promptAnswer, setPromptAnswer]: any = useState(null);
   const [status, setStatus]: any = useState("Starting");
 
+  /**
+   * Check if prompt ever changes if it does then that means the prompt was answered and
+   * do the appropriate action
+   */
   useEffect(() => {
     if (promptAnswer === false) {
       console.log("closing window");
@@ -32,36 +38,61 @@ const App = (): React.ReactElement => {
     }
   }, [promptAnswer]);
 
+  /**
+   * Things to be done on initial load like notifying the back that the front
+   * has loaded and is ready to receive data
+   */
   useEffect(() => {
+    /**
+     * Let the back know the front is ready
+     */
     ipc.send("FEREADY", "");
 
+    /**
+     * Set a listener if the back requires the user to interact for permission
+     * to end the users session.
+     */
     ipc.on("BELCUREQUESTGETRESTARTLCU", () => {
       setGivePrompt(true);
     });
 
+    /**
+     * Receive any data that the back may have before the front was ready.
+     */
     ipc.on("BEPRELOAD", (event, data) => {
       console.warn(`DATA PRELOAD: >${data}<`);
       if (data !== "" && data !== {}) {
-        setCredentials(data);
+        setSwaggerJson(data);
       } else {
         setStatus("Attempting to connect to the League Client");
       }
+      /**
+       * Not really needed anymore so we remove it.
+       */
       ipc.removeAllListeners("BEPRELOAD");
     });
 
+    /**
+     * Set a listener for when the LCU ever connects the front can ask for
+     * permission to end the users session and set the state which is the swagger
+     * json.
+     */
     ipc.on("LCUCONNECT", (event, data) => {
       console.log("Connected to league client!");
       setStatus("Connected to league client!");
       setGivePrompt(true);
-      setCredentials(data);
+      setSwaggerJson(data);
     });
 
+    /**
+     * If the LCU disconnects just change the variables back.
+     */
     ipc.on("LCUDISCONNECT", (event, data) => {
       console.log("League client disconnected; attempting to reconnect");
       setStatus("League client disconnected; attempting to reconnect");
       setGivePrompt(false);
       setPromptAnswer(null);
-      setCredentials("");
+      setSwaggerJson("");
     });
   }, []);
 
@@ -125,7 +156,7 @@ const App = (): React.ReactElement => {
         </div>
       </div>
 
-      {credentials !== "" ? (
+      {swaggerJson !== "" ? (
         <div className={appstyles.swaggercontainer}>
           <div className={appstyles.riftinfo}>
             <img src={Logo} className={appstyles.riftlogo} alt="" />
@@ -144,7 +175,7 @@ const App = (): React.ReactElement => {
           <Swagger
             docExpansion="none"
             defaultModelExpandDepth={1}
-            spec={credentials}
+            spec={swaggerJson}
           />
         </div>
       ) : (
