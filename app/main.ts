@@ -5,6 +5,8 @@ import { modifySystemYaml, deleteUserSession } from "./util";
 import * as path from "path";
 import axios from "axios";
 import RiotConnector from "./util/RiotConnector";
+import help from "./util/createSpec";
+import { throws } from "assert";
 
 /**
  * Check if is windows other wise assume is macOS since that is the
@@ -38,8 +40,11 @@ const instance = axios.create({
 let mainWindow: BrowserWindow | null = null;
 let windowLoaded = false;
 
-let LCUData: Record<string, string | number> | null = null;
+let LCUData: any = null;
 let swaggerJson: any;
+let swaggerEnabled = false;
+
+let requestedHelp: boolean = false;
 
 /**
  * Create electron window.
@@ -101,7 +106,31 @@ function createWindow() {
    */
   ipc.on("FEREADY", () => {
     mainWindow?.webContents.send("BEPRELOAD", swaggerJson ? swaggerJson : "");
-    ipc.removeAllListeners("FEREADY");
+  });
+
+  /**
+   * If the user accepts the restart prompt then delete the users session.
+   */
+  ipc.on("PROMPTRESTART", () => {
+    deleteUserSession(LCUData).catch(console.error);
+  });
+
+  /**
+   * If the user declines the prompt just fallback to /help which is less accurate but still gives
+   * us some documentation just not the same amount.
+   */
+  ipc.on("PROMPTHELP", async () => {
+    if (LCUData != "" || LCUData != null || LCUData != {}) {
+      const { username, password, port, protocol, address } = LCUData;
+      mainWindow?.webContents.send(
+        "LCUCONNECT",
+        await help({ username, password, port, protocol, address })
+      );
+    } else {
+      console.error("NO CREDENTIALS FOUND");
+    }
+
+    requestedHelp = true;
   });
 
   /**
@@ -125,15 +154,22 @@ function createWindow() {
    */
   riotconnector.on("leagueclient", async (data) => {
     console.log("initial lcu connect");
-    let swaggerEnabled = false;
+    LCUData = await data;
+    if (requestedHelp) {
+      help(data)
+        .then((res) => {
+          swaggerJson = res;
+          mainWindow?.webContents.send("LCUCONNECT", res);
+        })
+        .catch(console.error);
+      return;
+    }
 
     /**
      * During multiple restarts of the client the backend server is not instantly ready to
      * serve requests so we delay a bit
      */
     setTimeout(async () => {
-      LCUData = data;
-
       const { username, password, address, port } = LCUData;
 
       await instance
@@ -155,18 +191,13 @@ function createWindow() {
        * otherwise just prompt the user to allow us to end the users session.
        */
       if (swaggerEnabled) {
+        console.log("lcuswaggeren");
         mainWindow?.webContents.send("LCUCONNECT", swaggerJson);
       } else {
+        console.log("lcuswaggerdis");
         mainWindow?.webContents.send("BELCUREQUESTGETRESTARTLCU");
       }
     }, 5000);
-  });
-
-  /**
-   * If the user accepts the restart prompt then delete the users session.
-   */
-  ipc.on("PROMPTRESTART", () => {
-    deleteUserSession(LCUData).catch(console.error);
   });
 
   /**

@@ -3,15 +3,30 @@
  * @since 2.0.1
  */
 /* eslint-disable */
-const { Agent } = require("https");
+import { AxiosInstance } from "axios";
 
-const mixin = require("mixin-deep");
-const axios = require("axios");
+import { Agent } from "https";
+
+import mixin from "mixin-deep";
+import axios from "axios";
+
+interface createSpecInterface {
+  address: string;
+  port: number;
+  protocol: string;
+  username: string;
+  password: string;
+}
+
+interface rpInterface {
+  uri: string;
+  json: any;
+}
 
 /**
  * Simple axios instance with disabled SSL to allow the self signed cert
  */
-const instance = axios.create({
+const instance: AxiosInstance = axios.create({
   httpsAgent: new Agent({
     rejectUnauthorized: false,
   }),
@@ -23,12 +38,26 @@ const instance = axios.create({
  * @param uri {string}
  * @param json {boolean}
  */
-async function rp({ uri, json }) {
+async function rp({ uri, json }: rpInterface): Promise<any> {
   const request = await instance.get(uri);
   return request.data;
 }
 
-module.exports = async ({ address, port, username, password, protocol }) => {
+/**
+ * @param address
+ * @param port
+ * @param username
+ * @param password
+ * @param protocol
+ * @returns {Promise<{basePath: string, paths: {}, host: string, produces: [string, string, string], schemes: [*], definitions: {}, swagger: string, consumes, info: {description: string, title: string, version: *}}>}
+ */
+export default async ({
+  address = "127.0.0.1",
+  port,
+  username = "riot",
+  password,
+  protocol = "https",
+}: createSpecInterface): Promise<any> => {
   const helpConsole = await rp({
     uri: `${protocol}://${username}:${password}@${address}:${port}/help?format=Console`,
     json: true,
@@ -58,7 +87,7 @@ module.exports = async ({ address, port, username, password, protocol }) => {
     paths: {},
     info: {
       description: "Always up to date LCU API documentation",
-      title: "Rift Explorer",
+      title: "Rift Explorer 7",
       version: builds.version,
     },
     produces: [
@@ -330,6 +359,11 @@ module.exports = async ({ address, port, username, password, protocol }) => {
             in: argumentLocation,
             name: argument.name,
             required: !argument.optional,
+            format: argument.format,
+            type: argument.type,
+            additionalProperties: argument.additionalProperties,
+            items: argument.items,
+            schema: argument.schema,
           };
 
           if (/^u?int/.test(argument.type.type)) {

@@ -31,7 +31,7 @@ const App = (): React.ReactElement => {
   useEffect(() => {
     if (promptAnswer === false) {
       console.log("closing window");
-      ipc.send("program_close", "");
+      ipc.send("PROMPTHELP", "");
     } else if (promptAnswer === true) {
       console.log("sent prompt restart");
       ipc.send("PROMPTRESTART", "");
@@ -150,9 +150,11 @@ const App = (): React.ReactElement => {
         </div>
         <div className={appstyles.deadzone} />
         <div className={appstyles.column}>
-          <div className={appstyles.logo}>
-            <img src={Logo} alt="" /> Rift Explorer 7
-          </div>
+          {IS_WIN && (
+            <div className={appstyles.logo}>
+              <img src={Logo} alt="" /> Rift Explorer 7
+            </div>
+          )}
         </div>
       </div>
 
