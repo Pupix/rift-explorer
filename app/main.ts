@@ -164,35 +164,47 @@ function createWindow() {
       return;
     }
 
+    const { username, password, address, port } = LCUData;
+
     /**
-     * During multiple restarts of the client the backend server is not instantly ready to
-     * serve requests so we delay a bit
+     * During the initial load of the client the backend server is not instantly ready
+     * to serve requests so we check the connection first
      */
-    setTimeout(async () => {
-      const { username, password, address, port } = LCUData;
-
+    let serverReady = false;
+    let retries = 6; // reasonable amount of retries
+    while (!serverReady && retries > 0) {
       await instance
-        .get(`https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`)
-        .then((res) => {
-          swaggerJson = res.data;
-          swaggerEnabled = true;
-        })
-        .catch(() => {
-          console.log("Swagger request failed; assuming swagger is not enabled.");
+        .get(`https://${username}:${password}@${address}:${port}/`)
+        .catch((res) => {
+          if (res.errno !== 'ECONNREFUSED') {
+            serverReady = true;
+          } else {
+            retries--;
+          }
         });
+    };
 
-      /**
-       * If swagger is enabled send the swagger json to the fe for generation
-       * otherwise just prompt the user to allow us to end the users session.
-       */
-      if (swaggerEnabled) {
-        console.log("lcuswaggeren");
-        mainWindow?.webContents.send("LCUCONNECT", swaggerJson);
-      } else {
-        console.log("lcuswaggerdis");
-        mainWindow?.webContents.send("BELCUREQUESTGETRESTARTLCU");
-      }
-    }, 5000);
+    await instance
+      .get(`https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`)
+      .then((res) => {
+        swaggerJson = res.data;
+        swaggerEnabled = true;
+      })
+      .catch(() => {
+        console.log("Swagger request failed; assuming swagger is not enabled.")
+      });
+
+    /**
+     * If swagger is enabled send the swagger json to the fe for generation
+     * otherwise just prompt the user to allow us to end the users session.
+     */
+    if (swaggerEnabled) {
+      console.log("lcuswaggeren");
+      mainWindow?.webContents.send("LCUCONNECT", swaggerJson);
+    } else {
+      console.log("lcuswaggerdis");
+      mainWindow?.webContents.send("BELCUREQUESTGETRESTARTLCU");
+    };
   });
 
   /**
