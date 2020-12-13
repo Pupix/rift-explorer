@@ -8,6 +8,16 @@ import { parseDocument } from "yaml";
 import { platform } from "os";
 import { parse } from "./LockFileParser";
 
+interface LockFile {
+  username: string;
+  password: string;
+  port: number;
+  protocol: string;
+  PID: number;
+  processName: string;
+  address: string;
+}
+
 /**
  * Check if is windows other wise assume is macOS since that is the
  * only other supported OS.
@@ -131,7 +141,7 @@ export default class RiotConnector extends EventEmitter {
    * If the lockfile has been created then parse it and stop watching for it.
    * @param path
    */
-  _lockfileCreated(path) {
+  _lockfileCreated(path: string) {
     parse(path).then((data) => {
       this.emit("leagueclient", data);
       clearInterval(this._riotClientWatch);

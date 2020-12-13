@@ -10,9 +10,11 @@ const Prompt = ({ answer }: PromptPropsInterface): React.ReactElement => {
   return (
     <div className={styles.prompt}>
       <div className={styles.prompt_text}>
-        Rift explorer needs to log you out in order to work.
+        Rift explorer needs to log you out in order to get more accurate
+        documentation.
         <br />
-        Please press ok to continue both on the League client and below.
+        Please press Restart. If you wish to continue please press Restart below
+        and then exit on the league client.
       </div>
       <div className={styles.prompt_buttons}>
         <button
@@ -23,7 +25,8 @@ const Prompt = ({ answer }: PromptPropsInterface): React.ReactElement => {
             answer(false);
           }}
         >
-          Cancel
+          Don&apos;t Restart
+          <div className={styles.prompt_tip}>Will generate less endpoints</div>
         </button>
         <button
           type="button"
@@ -32,7 +35,7 @@ const Prompt = ({ answer }: PromptPropsInterface): React.ReactElement => {
             answer(true);
           }}
         >
-          Ok
+          Restart
         </button>
       </div>
     </div>
