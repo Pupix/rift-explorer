@@ -107,7 +107,6 @@ export default class RiotConnector extends EventEmitter {
      * Riot client isn't open, therefore we don't have the leaguePath.
      */
     if (!this.leaguePath) return;
-    clearInterval(this._leagueClientWatch);
 
     /**
      * Return if we are already watching the lockfile (= path hasn't changed).
@@ -146,7 +145,7 @@ export default class RiotConnector extends EventEmitter {
     this.emit("disconnect");
     this._lockfileWatch.close();
     console.log("Lost connection to leagueclient; restarting riotclient watch");
-    this.start();
+    this._riotClientWatch = setInterval(this._checkRiotClient.bind(this), 1000);
   }
 
   /**
