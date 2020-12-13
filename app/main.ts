@@ -6,7 +6,6 @@ import * as path from "path";
 import axios from "axios";
 import RiotConnector from "./util/RiotConnector";
 import help from "./util/createSpec";
-import { throws } from "assert";
 
 /**
  * Check if is windows other wise assume is macOS since that is the
@@ -91,6 +90,7 @@ function createWindow() {
   mainWindow.webContents.on("did-finish-load", () => {
     windowLoaded = true;
     mainWindow?.show();
+    riotconnector.start();
   });
 
   /**
@@ -213,6 +213,7 @@ function createWindow() {
    */
   riotconnector.on("disconnect", () => {
     LCUData = null;
+    swaggerEnabled = false;
 
     if (windowLoaded) {
       mainWindow?.webContents.send("LCUDISCONNECT");
@@ -236,8 +237,6 @@ function createWindow() {
   ipc.on("process_min", () => {
     mainWindow.minimize();
   });
-
-  riotconnector.start();
 }
 
 app.on("ready", createWindow);
