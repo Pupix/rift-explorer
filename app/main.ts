@@ -140,8 +140,7 @@ function createWindow() {
   riotconnector.on("riotclient", (leaguePath: string | undefined) => {
     if (!leaguePath) return;
 
-    console.log("Got here!");
-    console.log(leaguePath);
+    console.log(`Riotclient is open; corresponding league path: ${leaguePath}`);
     const systemYamlPath = path.join(leaguePath, "system.yaml");
 
     modifySystemYaml(systemYamlPath).catch(console.error);
@@ -173,17 +172,13 @@ function createWindow() {
       const { username, password, address, port } = LCUData;
 
       await instance
-        .get(
-          `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`
-        )
+        .get(`https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`)
         .then((res) => {
           swaggerJson = res.data;
           swaggerEnabled = true;
         })
         .catch(() => {
-          console.log(
-            "Swagger request failed; assuming swagger is not enabled."
-          );
+          console.log("Swagger request failed; assuming swagger is not enabled.");
         });
 
       /**

@@ -75,21 +75,14 @@ export default class RiotConnector extends EventEmitter {
        */
       if (IS_WIN) normalizedPath = normalizedPath.split(/\n|\n\r/)[1];
 
-      const match: RegExpMatchArray = normalizedPath.match(
-        '"--priority-launch-path=(.*?)"'
-      );
+      const match: RegExpMatchArray = normalizedPath.match('"--priority-launch-path=(.*?)"');
 
       /**
        * Check if there are any matches
        */
       if (!match) {
-        let product: string = normalizedPath.match(
-          '--launch-product=(.*?)[ $"]'
-        )[1];
-
-        let patchline: string = normalizedPath.match(
-          '--launch-patchline=(.*?)[ $"]'
-        )[1];
+        let product: string = normalizedPath.match('--launch-product=(.*?)[ $"]')[1];
+        let patchline: string = normalizedPath.match('--launch-patchline=(.*?)[ $"]')[1];
 
         this.leaguePath = parseDocument(
           readFileSync(
@@ -126,10 +119,7 @@ export default class RiotConnector extends EventEmitter {
       return;
 
     this._lockfileWatch?.close();
-    console.log(`Current detected leaguePath: ${this.leaguePath}`);
-    console.log(
-      `will start watching ${path.join(this.leaguePath, "lockfile")}`
-    );
+    console.log(`Will start watching ${path.join(this.leaguePath, "lockfile")}`);
 
     this._lockfileWatch = watch(path.join(this.leaguePath, "lockfile"));
     this._lockfileWatch.on("add", this._lockfileCreated.bind(this));
@@ -145,7 +135,7 @@ export default class RiotConnector extends EventEmitter {
     parse(path).then((data) => {
       this.emit("leagueclient", data);
       clearInterval(this._riotClientWatch);
-      console.log("clearing rito interval");
+      console.log("Lockfile information sent; clearing riotclient check interval");
     });
   }
 
@@ -155,6 +145,7 @@ export default class RiotConnector extends EventEmitter {
   _lockfileRemoved() {
     this.emit("disconnect");
     this._lockfileWatch.close();
+    console.log("Lost connection to leagueclient; restarting riotclient watch");
     this.start();
   }
 
@@ -163,10 +154,7 @@ export default class RiotConnector extends EventEmitter {
    */
   start() {
     this._riotClientWatch = setInterval(this._checkRiotClient.bind(this), 1000);
-    this._leagueClientWatch = setInterval(
-      this._checkLeagueClient.bind(this),
-      1000
-    );
+    this._leagueClientWatch = setInterval(this._checkLeagueClient.bind(this), 1000);
   }
 
   /**
