@@ -73,7 +73,7 @@ export default async ({
   const swagger = {
     host: `${address}:${port}`,
     schemes: [protocol],
-    basePath: "/",
+
     consumes: [
       "application/json",
       "application/vnd.api+json",
@@ -96,6 +96,17 @@ export default async ({
       "application/x-msgpack",
     ],
     swagger: "2.0",
+    components: {
+      securitySchemes: {
+        basicAuth: {
+          type: "http",
+          scheme: "basic",
+        },
+      },
+    },
+    security: {
+      basicAuth: [],
+    },
   };
 
   // Mix helps to get a more complete version
