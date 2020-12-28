@@ -6,7 +6,7 @@ import * as path from "path";
 import axios from "axios";
 import RiotConnector from "./util/RiotConnector";
 import help from "./util/createSpec";
-
+app.commandLine.appendSwitch("ignore-certificate-errors", "true");
 /**
  * Check if is windows other wise assume is macOS since that is the
  * only other supported OS.
@@ -63,6 +63,8 @@ function createWindow() {
       nodeIntegration: true,
       webSecurity: false,
       allowRunningInsecureContent: true,
+      scrollBounce: true,
+      devTools: IS_DEV,
     },
   });
 
@@ -137,7 +139,7 @@ function createWindow() {
    * When connected to the Riot Client start modification of the League clients
    * system.yml to enable swagger and to end the users current session.
    */
-  riotconnector.on("riotclient", (leaguePath: string | undefined) => {
+  riotconnector.on("riotclient", (leaguePath: any) => {
     if (!leaguePath) return;
 
     console.log(`Riotclient is open; corresponding league path: ${leaguePath}`);
@@ -154,6 +156,14 @@ function createWindow() {
   riotconnector.on("leagueclient", async (data) => {
     console.log("initial lcu connect");
     LCUData = await data;
+    if (platform() === "linux") {
+      const { username, password, port, protocol, address } = LCUData;
+      help({ username, password, port, protocol, address }).then((res) => {
+        mainWindow?.webContents.send("LCUCONNECT", res);
+      });
+
+      return;
+    }
     if (requestedHelp) {
       help(data)
         .then((res) => {
@@ -176,22 +186,24 @@ function createWindow() {
       await instance
         .get(`https://${username}:${password}@${address}:${port}/`)
         .catch((res) => {
-          if (res.errno !== 'ECONNREFUSED') {
+          if (res.errno !== "ECONNREFUSED") {
             serverReady = true;
           } else {
             retries--;
           }
         });
-    };
+    }
 
     await instance
-      .get(`https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`)
+      .get(
+        `https://${username}:${password}@${address}:${port}/swagger/v2/swagger.json`
+      )
       .then((res) => {
         swaggerJson = res.data;
         swaggerEnabled = true;
       })
       .catch(() => {
-        console.log("Swagger request failed; assuming swagger is not enabled.")
+        console.log("Swagger request failed; assuming swagger is not enabled.");
       });
 
     /**
@@ -204,7 +216,7 @@ function createWindow() {
     } else {
       console.log("lcuswaggerdis");
       mainWindow?.webContents.send("BELCUREQUESTGETRESTARTLCU");
-    };
+    }
   });
 
   /**

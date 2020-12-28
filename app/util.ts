@@ -2,6 +2,8 @@ import { outputFile, pathExists, readFile } from "fs-extra";
 import axios from "axios";
 import { Agent } from "https";
 import yaml, { Document } from "yaml";
+import { platform, homedir } from "os";
+import { join } from "path";
 
 /**
  * Simple axios instance with disabled SSL to allow the self signed cert
@@ -17,6 +19,9 @@ const instance = axios.create({
  * @param path {string}
  */
 export async function modifySystemYaml(path: string): Promise<void> {
+  if (platform() === "linux") {
+    path = join(homedir(), path.slice(2, path.length));
+  }
   /**
    * If File doesn't exist, do nothing.
    */

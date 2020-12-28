@@ -1,12 +1,13 @@
 import path from "path";
 import { EventEmitter } from "events";
 import { exec } from "child_process";
-import { normalize } from "path";
+import { normalize, join } from "path";
 import { readFileSync } from "fs-extra";
 import { FSWatcher, watch } from "chokidar";
 import { parseDocument } from "yaml";
 import { platform } from "os";
 import { parse } from "./LockFileParser";
+import { homedir } from "os";
 
 interface LockFile {
   username: string;
@@ -50,6 +51,15 @@ export default class RiotConnector extends EventEmitter {
   }
 
   _checkRiotClient() {
+    if (platform() === "linux") {
+      this._lockfileCreated(
+        join(
+          homedir(),
+          "./Games/league-of-legends/drive_c/Riot Games/League of Legends/lockfile"
+        )
+      );
+      return;
+    }
     /**
      * Get command based on platform.
      */
@@ -75,14 +85,20 @@ export default class RiotConnector extends EventEmitter {
        */
       if (IS_WIN) normalizedPath = normalizedPath.split(/\n|\n\r/)[1];
 
-      const match: RegExpMatchArray = normalizedPath.match('"--priority-launch-path=(.*?)"');
+      const match: RegExpMatchArray = normalizedPath.match(
+        '"--priority-launch-path=(.*?)"'
+      );
 
       /**
        * Check if there are any matches
        */
       if (!match) {
-        let product: string = normalizedPath.match('--launch-product=(.*?)[ $"]')[1];
-        let patchline: string = normalizedPath.match('--launch-patchline=(.*?)[ $"]')[1];
+        let product: string = normalizedPath.match(
+          '--launch-product=(.*?)[ $"]'
+        )[1];
+        let patchline: string = normalizedPath.match(
+          '--launch-patchline=(.*?)[ $"]'
+        )[1];
 
         this.leaguePath = parseDocument(
           readFileSync(
@@ -118,7 +134,9 @@ export default class RiotConnector extends EventEmitter {
       return;
 
     this._lockfileWatch?.close();
-    console.log(`Will start watching ${path.join(this.leaguePath, "lockfile")}`);
+    console.log(
+      `Will start watching ${path.join(this.leaguePath, "lockfile")}`
+    );
 
     this._lockfileWatch = watch(path.join(this.leaguePath, "lockfile"));
     this._lockfileWatch.on("add", this._lockfileCreated.bind(this));
@@ -134,7 +152,9 @@ export default class RiotConnector extends EventEmitter {
     parse(path).then((data) => {
       this.emit("leagueclient", data);
       clearInterval(this._riotClientWatch);
-      console.log("Lockfile information sent; clearing riotclient check interval");
+      console.log(
+        "Lockfile information sent; clearing riotclient check interval"
+      );
     });
   }
 
@@ -153,7 +173,13 @@ export default class RiotConnector extends EventEmitter {
    */
   start() {
     this._riotClientWatch = setInterval(this._checkRiotClient.bind(this), 1000);
-    this._leagueClientWatch = setInterval(this._checkLeagueClient.bind(this), 1000);
+    if (platform() === "linux") {
+      return;
+    }
+    this._leagueClientWatch = setInterval(
+      this._checkLeagueClient.bind(this),
+      1000
+    );
   }
 
   /**
