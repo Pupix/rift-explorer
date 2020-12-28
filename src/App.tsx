@@ -4,15 +4,12 @@ import { ipcRenderer as ipc } from "electron";
 
 import { platform } from "os";
 
-import Sweg from "swagger-ui-dist";
 import Loading from "./Loading";
 
 import appstyles from "./stylesheets/sass/app.module.sass";
 import Logo from "./images/logo.png";
 import discord from "./images/discord.svg";
 import github from "./images/github.svg";
-
-const swag = Sweg.SwaggerUIBundle({ spec: undefined });
 
 /**
  * Simple check to see if the platform is windows if not then assume it is macOS since that is the
