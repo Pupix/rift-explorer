@@ -31,6 +31,7 @@ const App = (): React.ReactElement => {
   const [promptAnswer, setPromptAnswer]: any = useState(null);
   const [status, setStatus]: any = useState("Starting");
   const [credentials, setCredentials]: any = useState();
+  const [isConnected, setIsConnected] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -127,6 +128,11 @@ const App = (): React.ReactElement => {
      */
     ipc.on("LCUCONNECT", (event, data) => {
       console.log("Connected to league client!");
+      // TODO: prevent
+      if (isConnected) {
+        return;
+      }
+      setIsConnected(true);
       setStatus("Connected to league client!");
       setGivePrompt(true);
       setSwaggerJson(data);
@@ -138,11 +144,12 @@ const App = (): React.ReactElement => {
     ipc.on("LCUDISCONNECT", (event, data) => {
       console.log("League client disconnected; attempting to reconnect");
       setStatus("League client disconnected; attempting to reconnect");
+      setIsConnected(false);
       setGivePrompt(false);
       setPromptAnswer(null);
       setSwaggerJson("");
     });
-  }, []);
+  });
 
   return (
     <>
