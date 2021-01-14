@@ -3,13 +3,21 @@ import Swagger from "swagger-ui-react";
 import { ipcRenderer as ipc } from "electron";
 
 import { platform } from "os";
+import { Agent } from "https";
 
+import axios from "axios";
+
+import { ok } from "assert";
 import Loading from "./Loading";
 
 import appstyles from "./stylesheets/sass/app.module.sass";
 import Logo from "./images/logo.png";
 import discord from "./images/discord.svg";
 import github from "./images/github.svg";
+
+const reAgent = new Agent({
+  rejectUnauthorized: false,
+});
 
 /**
  * Simple check to see if the platform is windows if not then assume it is macOS since that is the
@@ -22,6 +30,51 @@ const App = (): React.ReactElement => {
   const [givePrompt, setGivePrompt]: any = useState(false);
   const [promptAnswer, setPromptAnswer]: any = useState(null);
   const [status, setStatus]: any = useState("Starting");
+  const [credentials, setCredentials]: any = useState();
+
+  useEffect(() => {
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-ignore
+    window.fetch = (inf, req) => {
+      console.log(`${JSON.stringify(req)}`);
+      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+      // @ts-ignore
+      const { url, method } = req;
+      return axios
+        .request({
+          method: method || "get",
+          url,
+          httpsAgent: reAgent,
+          withCredentials: true,
+          responseType: "text",
+          transformResponse: (res) => res,
+          headers: {
+            Authorization: `Basic ${btoa(
+              `${credentials.username}:${credentials.password}`
+            )}`,
+          },
+        })
+        .then((res) => {
+          console.log(res.data);
+          console.log(res);
+          console.log(res.request.response);
+          console.log(`typeof res: ${typeof res}`);
+          const response = new Response(res.data, {
+            headers: res.headers,
+            status: res.status,
+            statusText: res.statusText,
+          });
+          return response;
+        });
+    };
+  });
+
+  useEffect(() => {
+    ipc.on("credentials_pass", (event, creds) => {
+      console.log(`credentials_pass: ${creds}`);
+      setCredentials(creds);
+    });
+  }, []);
 
   /**
    * Check if prompt ever changes if it does then that means the prompt was answered and
