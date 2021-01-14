@@ -33,6 +33,7 @@ For more information as to what the LCU is please refer to [this link](https://d
 ## Requirements
    - Windows 7 or above (64-bit)
    - macOS sierra or above (64-bit)
+   - Linux is partially supported(64-bit). - if you would like to help please open an issue regarding it
 
 *Note: 32-bit is unsupported.*
 
