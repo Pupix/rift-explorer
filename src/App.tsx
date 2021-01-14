@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import Swagger from "swagger-ui-react";
 import { ipcRenderer as ipc } from "electron";
 
 import { platform } from "os";
@@ -8,6 +7,7 @@ import { Agent } from "https";
 import axios from "axios";
 
 import { ok } from "assert";
+import Swagger from "./Swagger";
 import Loading from "./Loading";
 
 import appstyles from "./stylesheets/sass/app.module.sass";
@@ -36,7 +36,6 @@ const App = (): React.ReactElement => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     window.fetch = (inf, req) => {
-      console.log(`${JSON.stringify(req)}`);
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const { url, method } = req;
@@ -55,14 +54,11 @@ const App = (): React.ReactElement => {
           },
         })
         .then((res) => {
-          console.log(res.data);
-          console.log(res);
-          console.log(res.request.response);
           console.log(`typeof res: ${typeof res}`);
-          const response = new Response(res.data, {
+          const response = new Response(res.data ? res.data : "", {
             headers: res.headers,
-            status: res.status,
-            statusText: res.statusText,
+            status: res.status ? res.status : 200,
+            statusText: res.statusText ? res.statusText : "ok",
           });
           return response;
         });
@@ -225,13 +221,7 @@ const App = (): React.ReactElement => {
               <img src={github} alt="" className={appstyles.rifticons} />
             </div>
           </div>
-
-          <Swagger
-            docExpansion="none"
-            defaultModelExpandDepth={1}
-            plugins={[]}
-            spec={swaggerJson}
-          />
+          <Swagger spec={swaggerJson} />
         </div>
       ) : (
         <Loading
