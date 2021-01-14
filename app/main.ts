@@ -107,6 +107,9 @@ function createWindow() {
    * or just send an empty string.
    */
   ipc.on("FEREADY", () => {
+    if (LCUData) {
+      mainWindow?.webContents.send("credentials_pass", LCUData);
+    }
     mainWindow?.webContents.send("BEPRELOAD", swaggerJson ? swaggerJson : "");
   });
 
@@ -158,6 +161,9 @@ function createWindow() {
     LCUData = await data;
     if (platform() === "linux") {
       const { username, password, port, protocol, address } = LCUData;
+
+      mainWindow?.webContents.send("credentials_pass", LCUData);
+
       help({ username, password, port, protocol, address }).then((res) => {
         mainWindow?.webContents.send("LCUCONNECT", res);
       });
