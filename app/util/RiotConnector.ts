@@ -172,11 +172,11 @@ export default class RiotConnector extends EventEmitter {
    * Start the watchers.
    */
   start() {
-    this._riotClientWatch = setInterval(this._checkRiotClient.bind(this), 1000);
+    this._riotClientWatch ??= setInterval(this._checkRiotClient.bind(this), 1000);
     if (platform() === "linux") {
       return;
     }
-    this._leagueClientWatch = setInterval(
+    this._leagueClientWatch ??= setInterval(
       this._checkLeagueClient.bind(this),
       1000
     );
