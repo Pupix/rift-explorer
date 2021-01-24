@@ -65,7 +65,7 @@ export default class RiotConnector extends EventEmitter {
      */
     const command: string = IS_WIN
       ? `WMIC PROCESS WHERE name='${RIOTCLIENT_PROCESS}' GET CommandLine`
-      : `ps x -o comm= | grep '${RIOTCLIENT_PROCESS}$'`;
+      : `ps x -o command= | grep '${RIOTCLIENT_PROCESS}'`;
 
     /**
      * Execute the command
@@ -94,16 +94,27 @@ export default class RiotConnector extends EventEmitter {
        */
       if (!match) {
         let product: string = normalizedPath.match(
-          '--launch-product=(.*?)[ $"]'
+          (platform() !== 'darwin')
+            ? '--launch-product=(.*?)[ $"]'
+            : '--upgrade-product=(.*?)[ $"\n]'
         )[1];
         let patchline: string = normalizedPath.match(
-          '--launch-patchline=(.*?)[ $"]'
+          (platform() !== 'darwin')
+            ? '--launch-patchline=(.*?)[ $"]'
+            : '--upgrade-patchline=(.*?)[ $"\n]'
         )[1];
+
+        /**
+         * There is no ProgramData folder on MacOS
+         */
+        let programData = process.env.ProgramData;
+        if (platform() === 'darwin')
+          programData = '/Users/Shared';
 
         this.leaguePath = parseDocument(
           readFileSync(
             path.join(
-              process.env.ProgramData,
+              programData,
               "Riot Games",
               "MetaData",
               `${product}.${patchline}`,
@@ -111,6 +122,13 @@ export default class RiotConnector extends EventEmitter {
             )
           ).toString()
         ).get("product_install_full_path");
+
+        if (platform() === 'darwin')
+          this.leaguePath = path.join(
+            this.leaguePath,
+            'Contents',
+            'LoL'
+          );
       } else {
         this.leaguePath = path.dirname(match[1]);
       }
