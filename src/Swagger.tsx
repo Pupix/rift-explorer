@@ -4,6 +4,7 @@ import SwaggerUI from "swagger-ui";
 interface PropTypes {
   // eslint-disable-next-line @typescript-eslint/ban-types
   spec: object | string;
+  auth: string;
 }
 
 // eslint-disable-next-line react/prefer-stateless-function
@@ -15,7 +16,7 @@ export default class Swagger extends Component<PropTypes> {
 
   componentDidMount() {
     console.log("triggered swagger refresh");
-    const { spec } = this.props;
+    const { auth, spec } = this.props;
     try {
       SwaggerUI({
         dom_id: "#swagger",
@@ -26,8 +27,9 @@ export default class Swagger extends Component<PropTypes> {
         defaultModelExpandDepth: 1,
         displayRequestDuration: true,
         filter: "",
+        deepLinking: true,
         request: {
-          curlOptions: ["--insecure"],
+          curlOptions: ["--insecure", `-H "Authorization: ${auth}"`],
         },
       });
     } catch (e) {
@@ -37,7 +39,7 @@ export default class Swagger extends Component<PropTypes> {
 
   componentDidUpdate() {
     console.log("triggered swagger refresh");
-    const { spec } = this.props;
+    const { auth, spec } = this.props;
     try {
       SwaggerUI({
         dom_id: "#swagger",
@@ -48,8 +50,9 @@ export default class Swagger extends Component<PropTypes> {
         defaultModelExpandDepth: 1,
         displayRequestDuration: true,
         filter: "",
+        deepLinking: true,
         request: {
-          curlOptions: ["--insecure"],
+          curlOptions: ["--insecure", `-H "Authorization: ${auth}"`],
         },
       });
     } catch (e) {

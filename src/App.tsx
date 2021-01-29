@@ -43,9 +43,13 @@ const App = (): React.ReactElement => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     window.fetch = (inf, req) => {
+      if (!credentials) {
+        return;
+      }
       // eslint-disable-next-line @typescript-eslint/ban-ts-comment
       // @ts-ignore
       const { url, method } = req;
+      // eslint-disable-next-line consistent-return
       return axios
         .request({
           method: method || "get",
@@ -238,7 +242,12 @@ const App = (): React.ReactElement => {
               <img src={github} alt="" className={appstyles.rifticons} />
             </div>
           </div>
-          <Swagger spec={swaggerJson} />
+          <Swagger
+            spec={swaggerJson}
+            auth={`Basic ${btoa(
+              `${credentials.username}:${credentials.password}`
+            )}`}
+          />
         </div>
       ) : (
         <Loading
