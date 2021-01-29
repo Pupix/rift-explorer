@@ -44,7 +44,6 @@ let swaggerJson: any;
 let swaggerEnabled = false;
 
 let requestedHelp: boolean = false;
-
 /**
  * Create electron window.
  */

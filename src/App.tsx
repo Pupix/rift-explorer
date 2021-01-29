@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { ipcRenderer as ipc } from "electron";
+import * as Sentry from "@sentry/electron";
 
 import { platform } from "os";
 import { Agent } from "https";
@@ -69,6 +70,11 @@ const App = (): React.ReactElement => {
     ipc.on("credentials_pass", (event, creds) => {
       console.log(`credentials_pass: ${creds}`);
       setCredentials(creds);
+    });
+
+    Sentry.init({
+      dsn:
+        "https://8819124a931949c285f21102befaf7c3@o513342.ingest.sentry.io/5615032",
     });
   }, []);
 

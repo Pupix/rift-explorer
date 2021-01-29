@@ -20,8 +20,9 @@
   ],
   "license": "MIT",
   "private": true,
-  "main": "build/app/main.js",
+  "main": "build/app/entry.js",
   "dependencies": {
+    "@sentry/electron": "^2.2.0",
     "axios": "^0.21.0",
     "electron": "^11.0.4",
     "mixin-deep": "^2.0.1",
@@ -34,7 +35,7 @@
     "typescript": "^4.0.3"
   },
   "scripts": {
-    "dev": "tsc -p app && concurrently \"cross-env BROWSER=none NODE_ENV=development yarn react:start\" \"wait-on http://localhost:3000/ && electron ./build/app/main.js\"",
+    "dev": "tsc -p app && concurrently \"cross-env BROWSER=none NODE_ENV=development yarn react:start\" \"wait-on http://localhost:3000/ && electron ./build/app/entry.js\"",
     "react:start": "rescripts start",
     "react:build": "rescripts build",
     "postinstall": "electron-builder install-app-deps",
