@@ -83,7 +83,10 @@ function createWindow() {
    */
   mainWindow
     .loadURL(IS_DEV ? "http://localhost:3000" : `file://${ROOT}/index.html`)
-    .catch(console.error);
+    .catch((err) => {
+      console.error(err);
+      throw new Error("Error loading main page: " + err.message);
+    });
 
   /**
    * Only show the window when the page has fully loaded.
@@ -126,10 +129,19 @@ function createWindow() {
   ipc.on("PROMPTHELP", async () => {
     if (LCUData != "" || LCUData != null || LCUData != {}) {
       const { username, password, port, protocol, address } = LCUData;
-      mainWindow?.webContents.send(
-        "LCUCONNECT",
-        await help({ username, password, port, protocol, address })
-      );
+      const helpSwagger = help({
+        username,
+        password,
+        port,
+        protocol,
+        address,
+      });
+
+      try {
+        mainWindow?.webContents.send("LCUCONNECT", await helpSwagger);
+      } catch (e) {
+        console.error("Failed generating help swagger: " + e.message, e);
+      }
     } else {
       console.error("NO CREDENTIALS FOUND");
     }
@@ -147,7 +159,10 @@ function createWindow() {
     console.log(`Riotclient is open; corresponding league path: ${leaguePath}`);
     const systemYamlPath = path.join(leaguePath, "system.yaml");
 
-    modifySystemYaml(systemYamlPath).catch(console.error);
+    modifySystemYaml(systemYamlPath).catch((err) => {
+      console.error(err);
+      throw new Error("Error modifying system yaml: " + err.message);
+    });
   });
 
   /**
@@ -159,13 +174,21 @@ function createWindow() {
     console.log("initial lcu connect");
     LCUData = await data;
     if (platform() === "linux") {
-      const { username, password, port, protocol, address } = LCUData;
+      try {
+        const { username, password, port, protocol, address } = LCUData;
 
-      mainWindow?.webContents.send("credentials_pass", LCUData);
+        mainWindow?.webContents.send("credentials_pass", LCUData);
 
-      help({ username, password, port, protocol, address }).then((res) => {
-        mainWindow?.webContents.send("LCUCONNECT", res);
-      });
+        help({ username, password, port, protocol, address }).then((res) => {
+          mainWindow?.webContents.send("LCUCONNECT", res);
+        });
+      } catch (err) {
+        console.error(
+          "Failed to connect to client (might be running in the background i.e not fully closed)",
+          err
+        );
+        throw new Error(err.message);
+      }
 
       return;
     }
@@ -175,7 +198,10 @@ function createWindow() {
           swaggerJson = res;
           mainWindow?.webContents.send("LCUCONNECT", res);
         })
-        .catch(console.error);
+        .catch((err) => {
+          console.error(err);
+          throw new Error("Error building /help: " + err.message);
+        });
       return;
     }
 

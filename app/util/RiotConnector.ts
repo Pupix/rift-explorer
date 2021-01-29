@@ -94,12 +94,12 @@ export default class RiotConnector extends EventEmitter {
        */
       if (!match) {
         let product: string = normalizedPath.match(
-          (platform() !== 'darwin')
+          platform() !== "darwin"
             ? '--launch-product=(.*?)[ $"]'
             : '--upgrade-product=(.*?)[ $"\n]'
         )[1];
         let patchline: string = normalizedPath.match(
-          (platform() !== 'darwin')
+          platform() !== "darwin"
             ? '--launch-patchline=(.*?)[ $"]'
             : '--upgrade-patchline=(.*?)[ $"\n]'
         )[1];
@@ -108,8 +108,7 @@ export default class RiotConnector extends EventEmitter {
          * There is no ProgramData folder on MacOS
          */
         let programData = process.env.ProgramData;
-        if (platform() === 'darwin')
-          programData = '/Users/Shared';
+        if (platform() === "darwin") programData = "/Users/Shared";
 
         this.leaguePath = parseDocument(
           readFileSync(
@@ -123,12 +122,8 @@ export default class RiotConnector extends EventEmitter {
           ).toString()
         ).get("product_install_full_path");
 
-        if (platform() === 'darwin')
-          this.leaguePath = path.join(
-            this.leaguePath,
-            'Contents',
-            'LoL'
-          );
+        if (platform() === "darwin")
+          this.leaguePath = path.join(this.leaguePath, "Contents", "LoL");
       } else {
         this.leaguePath = path.dirname(match[1]);
       }
@@ -190,7 +185,10 @@ export default class RiotConnector extends EventEmitter {
    * Start the watchers.
    */
   start() {
-    this._riotClientWatch ??= setInterval(this._checkRiotClient.bind(this), 1000);
+    this._riotClientWatch ??= setInterval(
+      this._checkRiotClient.bind(this),
+      1000
+    );
     if (platform() === "linux") {
       return;
     }

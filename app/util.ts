@@ -57,10 +57,14 @@ export async function deleteUserSession(
 ) {
   const { username, password, address, port } = LCUData;
 
-  /**
-   * Delete the users session so they have to log back in.
-   */
-  await instance.delete(
-    `https://${username}:${password}@${address}:${port}/lol-rso-auth/v1/session`
-  );
+  try {
+    /**
+     * Delete the users session so they have to log back in.
+     */
+    await instance.delete(
+      `https://${username}:${password}@${address}:${port}/lol-rso-auth/v1/session`
+    );
+  } catch (e) {
+    throw new Error("Unable to delete session: " + e.message);
+  }
 }

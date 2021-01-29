@@ -68,7 +68,7 @@ const App = (): React.ReactElement => {
 
   useEffect(() => {
     ipc.on("credentials_pass", (event, creds) => {
-      console.log(`credentials_pass: ${creds}`);
+      console.log(`credentials_pass: ${JSON.stringify(creds)}`);
       setCredentials(creds);
     });
 
