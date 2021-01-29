@@ -67,6 +67,11 @@ const App = (): React.ReactElement => {
             status: res.status ? res.status : 200,
             statusText: res.statusText ? res.statusText : "k",
           });
+        })
+        .catch((error) => {
+          console.error(error);
+          console.error(`Credentials: ${JSON.stringify(credentials)}`);
+          throw new Error(error);
         });
     };
   });
