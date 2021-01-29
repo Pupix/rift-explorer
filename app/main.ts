@@ -1,6 +1,6 @@
 import { Agent } from "https";
 import { platform } from "os";
-import { app, BrowserWindow, ipcMain as ipc } from "electron";
+import { app, BrowserWindow, ipcMain as ipc, globalShortcut } from "electron";
 import { modifySystemYaml, deleteUserSession } from "./util";
 import * as path from "path";
 import axios from "axios";
@@ -95,6 +95,15 @@ function createWindow() {
     windowLoaded = true;
     mainWindow?.show();
     riotconnector.start();
+  });
+
+  /**
+   * When render process dies just kill the application when in dev
+   */
+  mainWindow.webContents.on("render-process-gone", () => {
+    if (IS_DEV) {
+      process.exit(0);
+    }
   });
 
   /**
@@ -282,7 +291,23 @@ function createWindow() {
   });
 }
 
-app.on("ready", createWindow);
+app.on("ready", () => {
+  if (IS_DEV) {
+    const ret = globalShortcut.register("CommandOrControl+B", () => {
+      console.warn("Forcibly throwing error!");
+      throw new Error("Debug force error throw");
+    });
+
+    if (!ret) {
+      console.log("Failed registering force error shortcut");
+    }
+
+    // Check whether a shortcut is registered.
+    console.log(globalShortcut.isRegistered("CommandOrControl+B"));
+  }
+
+  createWindow();
+});
 
 app.on("window-all-closed", () => {
   if (platform() !== "darwin") {

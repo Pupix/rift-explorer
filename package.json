@@ -23,6 +23,7 @@
   "main": "build/app/entry.js",
   "dependencies": {
     "@sentry/electron": "^2.2.0",
+    "@sentry/react": "^6.0.3",
     "axios": "^0.21.1",
     "electron": "^11.2.1",
     "mixin-deep": "^2.0.1",

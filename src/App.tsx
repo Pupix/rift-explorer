@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { ipcRenderer as ipc } from "electron";
-import * as Sentry from "@sentry/electron";
+import * as Sentry from "@sentry/react";
 
 import { platform } from "os";
 import { Agent } from "https";
 
 import axios from "axios";
 
-import { ok } from "assert";
 import Swagger from "./Swagger";
 import Loading from "./Loading";
 
@@ -34,6 +33,13 @@ const App = (): React.ReactElement => {
   const [credentials, setCredentials]: any = useState();
 
   useEffect(() => {
+    Sentry.init({
+      dsn:
+        "https://8819124a931949c285f21102befaf7c3@o513342.ingest.sentry.io/5615032",
+    });
+  }, []);
+
+  useEffect(() => {
     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
     // @ts-ignore
     window.fetch = (inf, req) => {
@@ -56,12 +62,11 @@ const App = (): React.ReactElement => {
         })
         .then((res) => {
           console.log(`typeof res: ${typeof res}`);
-          const response = new Response(res.data ? res.data : "", {
+          return new Response(res.data ? res.data : "", {
             headers: res.headers,
             status: res.status ? res.status : 200,
-            statusText: res.statusText ? res.statusText : "ok",
+            statusText: res.statusText ? res.statusText : "k",
           });
-          return response;
         });
     };
   });
@@ -72,9 +77,10 @@ const App = (): React.ReactElement => {
       setCredentials(creds);
     });
 
-    Sentry.init({
-      dsn:
-        "https://8819124a931949c285f21102befaf7c3@o513342.ingest.sentry.io/5615032",
+    document.addEventListener("keydown", (event) => {
+      if (event.ctrlKey && event.key === "f") {
+        throw new Error("FrontEnd force error");
+      }
     });
   }, []);
 
@@ -141,7 +147,7 @@ const App = (): React.ReactElement => {
     /**
      * If the LCU disconnects just change the variables back.
      */
-    ipc.on("LCUDISCONNECT", (event, data) => {
+    ipc.on("LCUDISCONNECT", () => {
       console.log("League client disconnected; attempting to reconnect");
       setStatus("League client disconnected; attempting to reconnect");
       setGivePrompt(false);
