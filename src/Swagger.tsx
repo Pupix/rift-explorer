@@ -14,7 +14,7 @@ export default class Swagger extends Component<PropTypes> {
     this.state = {};
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     console.log("triggered swagger refresh");
     const { auth, spec } = this.props;
     try {
@@ -37,7 +37,7 @@ export default class Swagger extends Component<PropTypes> {
     }
   }
 
-  componentDidUpdate() {
+  componentDidUpdate(): void {
     console.log("triggered swagger refresh");
     const { auth, spec } = this.props;
     try {
@@ -60,7 +60,7 @@ export default class Swagger extends Component<PropTypes> {
     }
   }
 
-  render() {
+  render(): any {
     return <div id="swagger" />;
   }
 }
