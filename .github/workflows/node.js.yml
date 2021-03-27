@@ -2,7 +2,7 @@ name: Rift Explorer CI
 
 on:
   push:
-    branches: [ master ]
+    branches: [ release/7.0.0 ]
   pull_request:
     branches: [ master ]
 
