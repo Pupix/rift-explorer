@@ -1,19 +1,19 @@
-import React, { useEffect, useState } from "react";
-import { ipcRenderer as ipc } from "electron";
 import * as Sentry from "@sentry/react";
 
-import { platform } from "os";
+import axios from "axios";
+import { ipcRenderer as ipc } from "electron";
 import { Agent } from "https";
 
-import axios from "axios";
-
-import Swagger from "./Swagger";
+import { platform } from "os";
+import React, { useEffect, useState } from "react";
+import discord from "./images/discord.svg";
+import github from "./images/github.svg";
+import Logo from "./images/logo.png";
 import Loading from "./Loading";
 
 import appstyles from "./stylesheets/sass/app.module.sass";
-import Logo from "./images/logo.png";
-import discord from "./images/discord.svg";
-import github from "./images/github.svg";
+
+import Swagger from "./Swagger";
 
 const reAgent = new Agent({
   rejectUnauthorized: false,
@@ -31,6 +31,7 @@ const App = (): React.ReactElement => {
   const [promptAnswer, setPromptAnswer]: any = useState(null);
   const [status, setStatus]: any = useState("Starting");
   const [credentials, setCredentials]: any = useState();
+  const [retry, setRetry]: any = useState(0);
 
   useEffect(() => {
     Sentry.init({
@@ -92,6 +93,11 @@ const App = (): React.ReactElement => {
       }
     });
   }, []);
+
+  useEffect(() => {
+    console.log(`Credentials are`);
+    console.log(credentials);
+  });
 
   /**
    * Check if prompt ever changes if it does then that means the prompt was answered and
@@ -164,6 +170,11 @@ const App = (): React.ReactElement => {
       setSwaggerJson("");
     });
   }, []);
+
+  const onRetry = () => {
+    setRetry(retry + 1);
+    ipc.send("FEREADY", "");
+  };
 
   return (
     <>
@@ -242,12 +253,26 @@ const App = (): React.ReactElement => {
               <img src={github} alt="" className={appstyles.rifticons} />
             </div>
           </div>
-          <Swagger
-            spec={swaggerJson}
-            auth={`Basic ${btoa(
-              `${credentials.username}:${credentials.password}`
-            )}`}
-          />
+          {credentials && (
+            <Swagger
+              spec={swaggerJson}
+              auth={`Basic ${btoa(
+                `${credentials.username}:${credentials.password}`
+              )}`}
+            />
+          )}
+
+          {!credentials && (
+            <div className={appstyles.err}>
+              <div>
+                AN ERROR HAS OCCURRED <br />
+              </div>
+              {/* eslint-disable-next-line react/button-has-type */}
+              <button className={appstyles.retry} onClick={onRetry}>
+                Retry #{retry}
+              </button>
+            </div>
+          )}
         </div>
       ) : (
         <Loading
