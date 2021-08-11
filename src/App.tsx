@@ -79,7 +79,7 @@ const App = (): React.ReactElement => {
           throw new Error(error);
         });
     };
-  });
+  }, [credentials]);
 
   useEffect(() => {
     ipc.on("credentials_pass", (event, creds) => {
@@ -97,7 +97,7 @@ const App = (): React.ReactElement => {
   useEffect(() => {
     console.log(`Credentials are`);
     console.log(credentials);
-  });
+  }, [credentials]);
 
   /**
    * Check if prompt ever changes if it does then that means the prompt was answered and
