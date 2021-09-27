@@ -38,7 +38,7 @@
   "scripts": {
     "dev": "tsc -p app && concurrently \"cross-env BROWSER=none NODE_ENV=development yarn react:start\" \"wait-on http://localhost:3000/ && electron ./build/app/entry.js\"",
     "react:start": "rescripts start",
-    "react:build": "rescripts build",
+    "build": "yarn && tsc -p app && rescripts build && yarn preelectron-pack && yarn electron-pack",
     "postinstall": "electron-builder install-app-deps",
     "preelectron-pack": "yarn build",
     "electron-pack": "build -mw",

@@ -38,7 +38,7 @@ export default class Swagger extends Component<PropTypes> {
   }
 
   componentDidUpdate(): void {
-    console.log("triggered swagger refresh");
+    console.log("triggered swagger refresh did update");
     const { auth, spec } = this.props;
     try {
       SwaggerUI({
