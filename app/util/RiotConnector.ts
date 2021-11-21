@@ -64,13 +64,20 @@ export default class RiotConnector extends EventEmitter {
      * Get command based on platform.
      */
     const command: string = IS_WIN
-      ? `WMIC PROCESS WHERE name='${RIOTCLIENT_PROCESS}' GET CommandLine`
+      ? `(Get-CimInstance Win32_Process -Filter "name = '${RIOTCLIENT_PROCESS}'").CommandLine`
       : `ps x -o command= | grep '${RIOTCLIENT_PROCESS}'`;
+
+    /**
+     * Get options for exec based on platform.
+     */
+    const execOptions: { shell?: string } = IS_WIN
+      ? { shell: `powershell` }
+      : {};
 
     /**
      * Execute the command
      */
-    exec(command, (error, stdout, stderr) => {
+    exec(command, execOptions, (error, stdout, stderr) => {
       if (error || !stdout || stderr) {
         return;
       }
@@ -83,7 +90,7 @@ export default class RiotConnector extends EventEmitter {
       /**
        * If Windows we need to slightly adjust.
        */
-      if (IS_WIN) normalizedPath = normalizedPath.split(/\n|\n\r/)[1];
+      if (IS_WIN) normalizedPath = normalizedPath.split(/[\n\r]/).join(" ");
 
       const match: RegExpMatchArray = normalizedPath.match(
         '"--priority-launch-path=(.*?)"'
