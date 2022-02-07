@@ -1,3 +1,7 @@
+### Rift Explorer is no longer maintained. For an alternative, see [LCU Explorer](https://github.com/HextechDocs/lcu-explorer).
+
+---
+
 ![Rift Explorer logo](assets/logo.png?raw=true)
 
 ----
@@ -6,7 +10,7 @@
 ![GitHub all releases](https://img.shields.io/github/downloads/pupix/rift-explorer/total)
 ![GitHub repo size](https://img.shields.io/github/repo-size/pupix/rift-explorer)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/pupix/rift-explorer)
-![Lines of code](https://img.shields.io/tokei/lines/github/pupix/rift-explorer)
+![Lines of code](https://img.shields.io/pupix/lines/github/pupix/rift-explorer)
 
 # Always up to date documentation for the League Client API.
 Rift Explorer helps aid development of LCU applications by generating documentation of the LCU
